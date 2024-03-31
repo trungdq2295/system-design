@@ -1,1 +1,1 @@
-# system-design-example
+# system-design
