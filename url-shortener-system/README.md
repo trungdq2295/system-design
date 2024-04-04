@@ -29,9 +29,9 @@ For now, I will focus on these endpoint only. For more information, you can star
 
 
 ## Testing Solution
-Unit Test - JUnit 5
-Integration Test - JUnit 5 and TestContainers
-Load Test - JMeter
+* Unit Test - JUnit 5
+* Integration Test - JUnit 5 and TestContainers
+* Load Test - JMeter
 
 
 
