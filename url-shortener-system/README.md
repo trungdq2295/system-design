@@ -18,7 +18,7 @@ A system aims to help user to shorten the link so it will easier to send
 * Maven
 
 ## System Design
-![System Design](https://github.com/trungdq2295/system-design/url-shortener-system/blob/main/system.png)
+![System Design](https://github.com/trungdq2295/system-design/blob/main/url-shortener-system/system.png)
 
 ## API Endpoint
 For now, I will focus on these endpoint only. For more information, you can start process-order-service and view http://localhost:8083/swagger-ui/index.html
