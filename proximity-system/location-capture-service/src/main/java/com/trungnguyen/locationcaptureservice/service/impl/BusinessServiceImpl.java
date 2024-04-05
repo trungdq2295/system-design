@@ -44,8 +44,8 @@ public class BusinessServiceImpl implements BusinessService {
         return CompletableFuture.runAsync(() -> {
             Location location = new Location();
             location.setId(id);
-            location.setLongtitude(request.longtitue());
-            location.setLongtitude(request.latitue());
+            location.setLatitude(request.latitude());
+            location.setLongitude(request.longitude());
             location.setTimestamp(System.currentTimeMillis());
             locationRepository.save(location);
         }, executorService);

@@ -3,7 +3,7 @@ CREATE KEYSPACE IF NOT EXISTS location WITH REPLICATION = {'class':
 
 CREATE TABLE location.location_capture(
                                           business_id text primary key ,
-                                          lat double,
-                                          long double,
-                                          timestamp timestamp
+                                          latitude double,
+                                          longitude double,
+                                          timestamp l
 )

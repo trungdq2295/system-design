@@ -9,8 +9,8 @@ public record  BusinessRequest(
 
         BusinessType businessType,
 
-        double longtitue,
+        double longitude,
 
-        double latitue
+        double latitude
 ) {
 }

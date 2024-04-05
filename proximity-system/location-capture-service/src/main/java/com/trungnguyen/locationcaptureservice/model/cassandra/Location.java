@@ -17,10 +17,10 @@ public class Location {
     private String id;
 
     @Column
-    private double lat;
+    private double latitude;
 
-    @Column(value = "long")
-    private double longtitude;
+    @Column(value = "longitude")
+    private double longitude;
 
     @Column(value="timestamp")
     private Long timestamp;
