@@ -3,8 +3,8 @@
 * Credit is given to this guy: https://systemdesignfightclub.com/ and his youtube channel: https://www.youtube.com/@SDFC
 
 # List Systems
-![URL Shortener System](https://github.com/trungdq2295/system-design/tree/main/url-shortener-system)
-![Proximity System](https://github.com/trungdq2295/system-design/tree/main/proximity-system)
+*[URL Shortener System](https://github.com/trungdq2295/system-design/tree/main/url-shortener-system)
+*[Proximity System](https://github.com/trungdq2295/system-design/tree/main/proximity-system)
 
   
 #
