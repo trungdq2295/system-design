@@ -2,6 +2,7 @@
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [System Design](#system-design)
+* [Set up](#set-up)
 * [API Endpoint](#api-endpoint)
 * [Testing Solution](#testing-solution)
 
@@ -9,6 +10,7 @@
 **Proximity System**
 
 A system aims to help user to find the nearest business shop they need
+
 ## Technologies
 * Java 17
 * Springboot 3.1.10
@@ -20,6 +22,13 @@ A system aims to help user to find the nearest business shop they need
 
 ## System Design
 ![System Design](https://github.com/trungdq2295/system-design/blob/main/proximity-system/proximity.png)
+
+## Set up
+* You can use docker to set up the database ( this is not requirement, just an optional)
+* Run Cassandra in docker
+> docker run -p 9042:9042 --name cassandra-spring-boot -d cassandra:latest
+* Run MySQL in docker
+> docker run -p 3306:3306 --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:latest
 
 ## API Endpoint
 

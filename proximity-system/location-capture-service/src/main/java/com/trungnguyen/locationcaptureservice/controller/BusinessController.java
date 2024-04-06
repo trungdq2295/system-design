@@ -24,8 +24,13 @@ public class BusinessController {
 
     @PostMapping
     public GenericResponse insertBusiness(@RequestBody BusinessRequest request) {
-        businessService.insertBusiness(request);
-        return new GenericResponse(HttpStatus.OK.value(), "", null);
+        boolean result = businessService.insertBusiness(request);
+        if (result) {
+            return new GenericResponse(HttpStatus.OK.value(), "", null);
+        } else {
+            return new GenericResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), null);
+        }
+
     }
 
 }

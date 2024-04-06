@@ -5,5 +5,5 @@ import com.trungnguyen.locationcaptureservice.model.BusinessRequest;
 
 public interface BusinessService {
 
-    void insertBusiness(BusinessRequest request);
+    boolean insertBusiness(BusinessRequest request);
 }
