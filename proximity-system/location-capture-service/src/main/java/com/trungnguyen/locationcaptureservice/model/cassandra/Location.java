@@ -21,7 +21,7 @@ public class Location {
     @Column
     private double latitude;
 
-    @Column(value = "longitude2")
+    @Column(value = "longitude")
     private double longitude;
 
     @Column(value = "timestamp")

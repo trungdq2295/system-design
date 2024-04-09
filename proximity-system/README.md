@@ -25,10 +25,17 @@ A system aims to help user to find the nearest business shop they need
 
 ## Set up
 * You can use docker to set up the database ( this is not requirement, just an optional)
-* Run Cassandra in docker
+* Set up Cassandra in docker
 > docker run -p 9042:9042 --name cassandra-spring-boot -d cassandra:latest
-* Run MySQL in docker
+* Set up MySQL in docker
 > docker run -p 3306:3306 --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:latest
+* Set up Elasticsearch Cluster
+> docker network create elastic
+* master node
+> docker run --name es01 -e "xpack.security.enabled=false" -e "xpack.security.enrollment.enabled=false" -e "discovery.seed_hosts=es01" --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+* replica node
+> docker run -d --name es02 --net elastic -p 9300:9200 -e "xpack.security.enabled=false" -e "xpack.security.enrollment.enabled=false" -e "discovery.seed_hosts=es01" -e "cluster.initial_master_nodes=es01" -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+> docker run -d --name es03 --net elastic -p 9400:9200 -e "xpack.security.enabled=false" -e "xpack.security.enrollment.enabled=false" -e "discovery.seed_hosts=es01" -e "cluster.initial_master_nodes=es01" -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.13.2
 
 ## API Endpoint
 
