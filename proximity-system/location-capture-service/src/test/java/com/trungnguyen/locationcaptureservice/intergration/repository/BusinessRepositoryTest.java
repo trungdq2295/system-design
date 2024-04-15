@@ -1,4 +1,4 @@
-package com.trungnguyen.locationcaptureservice.unit.repository;
+package com.trungnguyen.locationcaptureservice.intergration.repository;
 
 
 import com.trungnguyen.locationcaptureservice.constant.MockDataConstant;

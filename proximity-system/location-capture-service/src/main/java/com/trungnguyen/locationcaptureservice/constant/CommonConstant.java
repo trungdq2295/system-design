@@ -7,6 +7,6 @@ public class CommonConstant {
 
     public static final String TEST_ENDPOINT = "test";
 
-    public static final String URL_BUSINESS = "business";
+    public static final String BUSINESS_ENDPOINT = "business";
 
 }

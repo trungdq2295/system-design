@@ -20,5 +20,4 @@ public class MockDataConstant {
 
     public static final BusinessType BUSINESS_TYPE = BusinessType.CONVENIENCE_STORE;
 
-
 }

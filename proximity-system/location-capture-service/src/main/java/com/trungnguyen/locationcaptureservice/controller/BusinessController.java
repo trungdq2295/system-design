@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(CommonConstant.VERSION_V1 + CommonConstant.URL_BUSINESS)
+@RequestMapping(CommonConstant.VERSION_V1 + CommonConstant.BUSINESS_ENDPOINT)
 public class BusinessController {
 
     private final BusinessService businessService;

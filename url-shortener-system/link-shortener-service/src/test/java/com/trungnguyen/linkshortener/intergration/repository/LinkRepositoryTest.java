@@ -1,4 +1,4 @@
-package com.trungnguyen.linkshortener.unit.repository;
+package com.trungnguyen.linkshortener.intergration.repository;
 
 
 import com.trungnguyen.linkshortener.configuration.MongoDBTestConfiguration;
