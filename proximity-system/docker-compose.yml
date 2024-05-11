@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  cassandra-spring-boot:
+    image: cassandra:latest
+    container_name: cassandra-spring-boot
+    ports:
+      - "9042:9042"
+    networks:
+      - elastic
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  some-mysql:
+    image: mysql:latest
+    container_name: some-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    ports:
+      - "3306:3306"
+    networks:
+      - elastic
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+    container_name: es01
+    environment:
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    networks:
+      - elastic
+    ports:
+      - "9200:9200"
+    mem_limit: 1GB
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  es02:
+    depends_on:
+      - es01
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+    container_name: es02
+    environment:
+      - node.name=es02
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+    networks:
+      - elastic
+    ports:
+      - "9300:9200"
+    mem_limit: 1GB
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  es03:
+    depends_on:
+      - es02
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+    container_name: es03
+    environment:
+      - node.name=es03
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+    networks:
+      - elastic
+    ports:
+      - "9400:9200"
+    mem_limit: 1GB
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+networks:
+  elastic:
