@@ -24,7 +24,7 @@ public class TestSynchornizeDataServiceApplication {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.from(SynchornizeDataServiceApplication::main).with(TestSynchornizeDataServiceApplication.class).run(args);
+		SpringApplication.from(SynchronizeDataServiceApplication::main).with(TestSynchornizeDataServiceApplication.class).run(args);
 	}
 
 }

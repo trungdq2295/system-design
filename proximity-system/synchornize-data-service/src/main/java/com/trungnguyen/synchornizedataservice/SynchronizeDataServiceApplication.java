@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SynchornizeDataServiceApplication {
+public class SynchronizeDataServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SynchornizeDataServiceApplication.class, args);
+		SpringApplication.run(SynchronizeDataServiceApplication.class, args);
 	}
 
 }
