@@ -12,5 +12,5 @@ insert into synchronization.es_shard_location
     (es_name, es_ip_address, es_port, last_update_date)
 VALUES
 ("es01","localhost",9200,SUBDATE(NOW(),1)),
-("es02","localhost",9301,SUBDATE(NOW(),1)),
+("es02","localhost",9300,SUBDATE(NOW(),1)),
 ("es03","localhost",9400,SUBDATE(NOW(),1));

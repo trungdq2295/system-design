@@ -29,13 +29,22 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
     container_name: es01
     environment:
-      - discovery.type=single-node
+      - node.name=es01
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
     networks:
       - elastic
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     ports:
       - "9200:9200"
+      - "9300:9300"  # Corrected port
     mem_limit: 2GB
     deploy:
       restart_policy:
@@ -45,13 +54,18 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
     container_name: es02
     environment:
-      - discovery.type=single-node
+      - node.name=es02
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
     networks:
       - elastic
     ports:
-      - "9300:9200"  # Corrected port
+      - "9301:9200"  # Corrected port
+      - "9302:9300"  # Corrected port
     mem_limit: 2GB
     ulimits:
       memlock:
@@ -65,13 +79,17 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
     container_name: es03
     environment:
-      - discovery.type=single-node
+      - node.name=es03
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - cluster.name=docker-cluster
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
     networks:
       - elastic
     ports:
       - "9400:9200"
+      - "9401:9300"  # Corrected port
     mem_limit: 2GB
     ulimits:
       memlock:

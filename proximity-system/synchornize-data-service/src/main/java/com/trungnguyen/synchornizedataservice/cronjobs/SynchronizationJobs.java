@@ -18,14 +18,21 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.data.elasticsearch.client.erhlc.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Component
 public class SynchronizationJobs {
+
+    private final long INITIAL_TIME = 900000L;//15minutes
+
+    private final long INTERVAL_TIME = 3600000;//1hr
 
 
     private ElasticSearchConnectionRepository repository;
@@ -37,11 +44,18 @@ public class SynchronizationJobs {
         this.locationRepository = locationRepository;
     }
 
+    /**
+     * Job will start to run after 15min of application startup
+     * The time Interval will be 1 hour
+     */
+    @Scheduled(initialDelay = INITIAL_TIME, fixedRate = INTERVAL_TIME)
     public void synchronizeData(){
         List<ElasticsearchShard> list = repository.findAll();
         for(ElasticsearchShard shard : list){
             Optional<List<Location>> data = locationRepository.findAllByTimestampAfter(shard.getLastUpdateDate().getTime());
             if(data.isPresent() && !data.get().isEmpty()){
+                // this value stand for the time when we get data and we use this value to update es after sync data from cassandra to ES
+                var now = new Date();
                 var template = createElasticSearchTemplateConnection(shard);
                 for(Location location : data.get()){
                     LocationIndex indexData = new LocationIndex();
@@ -50,9 +64,10 @@ public class SynchronizationJobs {
                     indexData.setType(BusinessType.GAS_STATION);
                     template.save(indexData, IndexCoordinates.of("location"));
                 }
+                shard.setLastUpdateDate(now);
+                repository.save(shard);
             }
         }
-
     }
 
 
