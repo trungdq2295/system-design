@@ -7,9 +7,9 @@
 * [Testing Solution](#testing-solution)
 
 ## General info
-**Proximity System**
+**Youtube System**
 
-A system aims to help user to find the nearest business shop they need
+A system aims to provide user where user can watch and upload their video
 
 ## Technologies
 * Java 17
