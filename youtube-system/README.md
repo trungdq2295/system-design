@@ -15,8 +15,10 @@ A system aims to provide user where user can watch and upload their video
 * Java 17
 * Springboot 3.1.10
 * Elasticsearch
-* MySql
-* Cassandra
+* MongoDb
+* Kafka
+* Amazon S3
+* Amazon CloudFront
 * TestContainer
 * Maven
 
