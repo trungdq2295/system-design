@@ -23,7 +23,7 @@ A system aims to provide user where user can watch and upload their video
 * Maven
 
 ## System Design
-![System Design](https://github.com/trungdq2295/system-design/blob/main/youtube-system/systemn.png)
+![System Design](https://github.com/trungdq2295/system-design/blob/main/youtube-system/system.png)
 
 ## Set up
 * You can use docker-compose.yml which is located in setup/mongodb-kafka-base to set up the configuration
