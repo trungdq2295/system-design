@@ -7,7 +7,8 @@ curl -X POST \
          "connection.uri":"mongodb://mongo1:27017/?replicaSet=rs0",
          "database":"quickstart",
          "collection":"sampleData",
-         "pipeline":"[{\"$match\": {\"operationType\": \"insert\"}}, {$addFields : {\"fullDocument.travel\":\"MongoDB Kafka Connector\"}}]"
+         "transforms": "unwrap",
+         "transforms.unwrap.type": "io.debezium.connector.mongodb.transforms.ExtractNewDocumentState"
          }
      }
      ' \

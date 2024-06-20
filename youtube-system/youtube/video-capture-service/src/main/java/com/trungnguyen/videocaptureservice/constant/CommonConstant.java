@@ -7,6 +7,7 @@ public class CommonConstant {
 
     public static final String TEST_ENDPOINT = VERSION_V1 + "test";
 
-    public static final String LOOKUP_ENDPOINT = VERSION_V1 + "lookup";
+    public static final String UPLOAD_ENDPOINT = VERSION_V1 + "upload";
+    public static final String PRESIGNED_ENDPOINT = "/presigned";
 
 }

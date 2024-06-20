@@ -11,6 +11,10 @@
     <modules>
         <module>video-capture-service</module>
     </modules>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
 
 
     <dependencyManagement>
@@ -19,6 +23,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
                 <version>3.2.5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>2.25.66</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

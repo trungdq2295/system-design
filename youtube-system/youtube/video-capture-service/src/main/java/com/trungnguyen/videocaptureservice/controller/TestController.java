@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(CommonConstant.VERSION_V1 + CommonConstant.TEST_ENDPOINT)
+@RequestMapping(CommonConstant.TEST_ENDPOINT)
 public class TestController {
 
     @GetMapping
