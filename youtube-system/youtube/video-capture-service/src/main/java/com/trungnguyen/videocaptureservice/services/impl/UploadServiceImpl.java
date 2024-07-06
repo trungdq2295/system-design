@@ -1,6 +1,7 @@
 package com.trungnguyen.videocaptureservice.services.impl;
 
 
+import com.trungnguyen.videocaptureservice.enumeration.VideoStatus;
 import com.trungnguyen.videocaptureservice.model.GenericResponse;
 import com.trungnguyen.videocaptureservice.model.ProducerMessage;
 import com.trungnguyen.videocaptureservice.model.mongo.Metadata;
@@ -13,6 +14,7 @@ import com.trungnguyen.videocaptureservice.services.UploadService;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class UploadServiceImpl implements UploadService {
@@ -42,9 +44,10 @@ public class UploadServiceImpl implements UploadService {
         metadata.setVideoTitle(request.title());
         metadata.setUploadUrl(request.uploadUrl());
         metadata.setUploaderId(request.uploaderId());
+        metadata.setUploadStatus(VideoStatus.PENDING);
         metadataRepository.save(metadata);
         ProducerMessage<Metadata> data = ProducerMessage.buildMessage(metadata);
-        producer.produceMessage(data);
+        CompletableFuture.runAsync(() -> producer.produceMessage(data));
         return GenericResponse.ok(true);
     }
 }
