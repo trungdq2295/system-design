@@ -7,6 +7,7 @@
 * [URL Shortener](https://github.com/trungdq2295/system-design/tree/main/url-shortener-system)
 * [Proximity](https://github.com/trungdq2295/system-design/tree/main/proximity-system)
 * [Youtube](https://github.com/trungdq2295/system-design/tree/main/youtube-system)
+* [Web Crawler](https://github.com/trungdq2295/system-design/tree/main/web-crawler)
 
   
 #
