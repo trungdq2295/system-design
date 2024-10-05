@@ -1,0 +1,70 @@
+Functional Requirement
+- scrape links and webpages from the internet
+- present link recommendations when user provide some text
+Non function requirement
+- High Availability, It's ok for the result to be a little stale
+
+
+
+Out of Scope:
+- Auto - complete
+- Analytics on the queries themselves
+- robot.txt, politeness: is about to respsect other websites when collecting data from them. 
+	For example: Some websites provides robot.txt file to contains information which one you can crawl and which one you can't. Interval time between each call, Limit call per day
+
+
+Numbers:
+- 20B web pages
+- 3B pages crawled per month
+- 2B DAU with avg of 5 queries per day
+- 100kb per webpages
+- 100 avg chars per URL (max is 2048)
+
+what's our write rate going tobe?
+3B Pages per month
+3B / 30 -> 100M pages record per day
+100M / 100k -> 1k write per second
+
+What's our read rate going to be?
+2B DAU * 5 queries perday = 10B queries per day
+10B/100k -> 100k queries per second
+
+
+What bandwith will we need? (on the crawler)
+
+1k writes per second
+100kb per web page
+100 kb * 1k = 100MB per second = 0.1 GBps  
+Usually we measure the internet in gigabit => 0.1GBps = 0.8Gbps
+=> EC2 m5 => 0.75 - 2.5Gbps
+1 - 2 machine
+
+
+How much storage do we need for all 
+20B we pages
+100kb each
+ 20B * 100kb
+= 2B MB
+= 2M GB
+= 2K TB
+= 2 PB
+2TB - 100 TB per HDD -> 20 - 1000 HDDs
+
+
+
+Estimatation network for 100k request per second
+10 URLs per request
+each URL is 100 character
+=> 100 bytes
+=> 0.1kB
+
+each request is 1kB
+
+100k request per second * 1kb each
+ = 100k * 1kb
+= 100,000kB
+= 100 MB
+= 0.1GB
+=0.8 Gbps ( usually 1 machine can handle it with this network bandwith)
+Usually, we have 1 machines can handle up to 1k RPS => minimum is 100 machines
+But for the minimal downtime, better 1000 machines
