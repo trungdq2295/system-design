@@ -7,9 +7,9 @@
 * [Testing Solution](#testing-solution)
 
 ## General info
-**Web Crawler System**
+**Ad Click Aggregator System**
 
-A system aims to crawl the data from website
+A system aims to provide user where user can view aggregated ad click data
 
 ## Technologies
 To be Updated
@@ -17,7 +17,7 @@ To be Updated
 * Springboot 3.1.10
 
 ## System Design
-![System Design](https://github.com/trungdq2295/system-design/blob/main/web-crawler/system.png)
+![System Design](https://github.com/trungdq2295/system-design/blob/main/ad-click-aggregator/system.png)
 
 ## Set up
 To be Updated
