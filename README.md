@@ -11,4 +11,4 @@
 
   
 #
-* P/s: I might not be able to provide all setup so feel free to email me at trungdq2295@gmail.com if you need have any problem on starting project or found any bug.
+* P/s: I might not be able to provide all setup so feel free to email me at trungdq2295@gmail.com if you have any problem on starting project or found any bug.
