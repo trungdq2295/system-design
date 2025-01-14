@@ -1,0 +1,31 @@
+System Design	
+	Clarify
+		Don't assume but to ask interviewer to clarify what htey want
+		Example: 
+			Is this mobile app? or web app? or both
+			What is the most important feature
+		Do the back-of-the-envelope calculation
+			Example: DAU, storage, network
+Time Allocating
+	Understand the problem and establish design scope: 3 - 10 minutes
+	Propose high-level design and get buy-in: 10 - 15 minutues
+	Design Deep dive: 10 - 25 minutes
+	Wrap: 3- 5 minutes
+Do and Don't
+	Do
+		Always ask for clarification. Do not assume your asusmption is correct
+		Understand the requirements of the problem
+		There is nether the right answer nor the best answer. A solution designed to solve the problesm of a young startup is different from that of an established company with million of users. Make sure you understand the requirements.
+		Let the interveiwer know what you are thinking. Communiate with your interviewer
+		Suggest multiple approaches if possible
+		Once you agree with your interviewer on the blueprint, go into details on each component. Design the most critical components first.
+		Bounce ideas off  the inteviewer. A good interveiwer works with you as a teammate.
+		Never give up
+	Don't
+		Don't be unprepared for typical interview question
+		Don't jump into a solution without clarifying the reuirements and assumptions
+		Don't go into too much detail on a single component in the begining. Give the high-level design first then drill down.
+		If you get stuck, don't hesitate to ask for the hints
+		Again, communicate. Don't think in silence
+		Don't think your interview is done once you give the design. You are not done until your interviewer says you are done. Ask for feedback early and often
+		

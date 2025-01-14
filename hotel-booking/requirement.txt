@@ -1,0 +1,28 @@
+Hotel Booking
+
+
+Function Requirement
+	- Customers can view available rooms
+	- Custoemrs can make a reservation
+	- The front desk people have reservation info for checking people info
+	- preventing double-booking vs 10% over-booking
+
+
+
+Non-Functional Requirement
+	- High consistency: No stale data here
+
+
+// Learn how to deal with this later
+Out-of-scope
+	- Dynamic Pricing
+	- How the check in process works when customer arrives to hotel
+
+Back-to-envelope calcuation
+	- 3B pages views per month
+	- 30M reservation per month
+
+	- Read:Write Ratio: 100: 1
+		Read per second: 3*10^9 / 30  = 10^ 8 / 10^5 = 1,000 RPS
+		Write per second: 3 * 10^7 =  10 Write per second
+

@@ -1,0 +1,7 @@
+Rate Limiter
+	Why?
+		Prevent resource starvation caused by Denial of Service (DoS)
+		Reduce Cost
+			Some company might use 3rd-party and get charged based on the number of APi calls
+		Prevent server from being overloadded
+			To filter out excess request casued by bots or user's misbehavior
