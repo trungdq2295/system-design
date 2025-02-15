@@ -1,0 +1,52 @@
+Batch Promotion Email
+
+
+Requirement
+	- Send 1M emails in 10 minutes, following a template with customizable info
+	- Analytics on whether they click the stuff in emails
+	- At most once delivery
+
+
+Why 10 minutes?
+	- For the convenience of the marketing users
+	- For highlighting the impact of your marketing campaign. Why?
+		- Sometime you don't want to send to all users at same time. This can cause a spike to your system
+		- Or you want to view the interaction between user and email if the user click the email after receiving it during the day(from morning to night)
+
+
+Scenarios:
+	For highlighting the impact of your marketing campaign
+	- Amazon.com that shows product recommendations ( this is expensive because each user can hve different product)
+
+	For the convenience of the marketing users
+	- A magazine telling you to subscribe ( this is just simple like hey, subscribe to our magazine)
+
+
+Non-functional requriement
+	- At most once delivery
+	- the least amount of failed email sends as possible
+	- High availability
+
+Estimation number
+1M emails to send in under 10 minutes
+50kB per email ( let's assume without attachment
+
+
+=> Email per second = 1M/ 10 * 60 = 10^6 / 500 = 10^4 / 5 = 2000 RPS
+
+
+What's the bandwidth
+2,000 email per second * 50kb = 100,000kb ~ 100Mb /second ~ 0.1 GB per second ~ 0.8gigabit per second
+=> 1.0 gb per second is reasonable for one machine's bandwith on its internet connection
+
+
+But what if we handle 2000 RPS on single machine?
+2000 request per second
+16 cores to CPU
+
+2000/16 = 500/4 = 125 request per second for each core,
+let say 100 request per core => 1000ms for 100 request per core
+=> each request can only copy a core for 10ms (unrealistic)
+=> each request should be aroudn 100ms => that's like 10 machine ( i think? )
+
+if we have 64 cores => 30 request second per core ( too much core -> tooo expesnive)

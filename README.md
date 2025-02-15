@@ -12,6 +12,8 @@
 * [Web Crawler](https://github.com/trungdq2295/system-design/tree/main/web-crawler)
 * [Hotel Booking](https://github.com/trungdq2295/system-design/tree/main/hotel-booking)
 * [Rate Limiter](https://github.com/trungdq2295/system-design/tree/main/rate-limiter)
+* [Batch Promotion Email](https://github.com/trungdq2295/system-design/tree/main/batch-promotion-email)
+* [Ad Click Aggregator](https://github.com/trungdq2295/system-design/tree/main/ad-click-aggregator)
   
 #
 * P/s: I might not be able to provide all setup so feel free to email me at trungdq2295@gmail.com if you have any problem on starting project or found any bug.

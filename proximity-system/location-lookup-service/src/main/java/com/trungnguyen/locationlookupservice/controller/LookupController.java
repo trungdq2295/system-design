@@ -24,7 +24,7 @@ public class LookupController {
     @GetMapping
     public GenericResponse lookUp(LookUpRequest request) {
         if (Objects.isNull(request.type())) {
-            return new GenericResponse<>(HttpStatus.BAD_GATEWAY.value(), "Invalid type", null);
+            return new GenericResponse<>(HttpStatus.BAD_REQUEST.value(), "Invalid type", null);
         }
         return new GenericResponse<>(200, "", locationLookupService.lookUp(request));
     }
