@@ -5,7 +5,7 @@
 ## General info
 **Batch Promotion Email System**
 
-A system aims to provide user where user can watch and upload their video
+A system aims to send a batch of emails to the users
 
 ## System Design
 ![System Design](https://github.com/trungdq2295/system-design/blob/main/batch-promotion-email/system.png)

@@ -1,0 +1,52 @@
+Inventory Design
+
+
+
+Requirement:
+- show available items
+- track the inventory, as it changes
+- inventory changes may occur in distributed transaction performed by other services
+- expose an interface for these distribute transactions
+- inventory snapshots and auditing
+
+
+Out of scope:
+- ordering itself
+- payments
+- listings and location look-up
+
+call outs:
+- thread contention (This mean you have so many request into a single record)
+	=> this can lead to timeout for some request
+	One Approach is not to track the amount of item, just let customers order. However, you need to cancel some customer's order if you don't have enough items to ship to customer
+	Another approach is to sharding your item DB
+- large objects issue if too many "holds" get placed
+	=> This mean your item has so many holds like humdred or thoudsand
+	=> You can split the hold into different DB
+
+Numbers:
+- 3.0 "visited" in on month and 10 page views per visits
+- 300M items were sold over the course of 2 days for prime day 2022
+
+How many reads per second
+3 B visited /30 days = > 1B view/days => 10^9 / 10^5 = 10^4 RPS
+
+How many writes per second
+300M / 2 days => 150M / days => 1.5 * 10^8 / 10^5 = 1.5* 10^3 writes per second
+
+
+Distribute Transaction
+Strong consistency => synchronous
+1/ Place a hold on the item
+request:
+	item_id: abc_123
+	count:  2
+response:
+	abcdef-12345-abcdef-12345
+
+high availablity
+2/ "execute" the hold
+requesst:
+	uuid: abcdef-12345-abcdef-12345
+response:
+	200
