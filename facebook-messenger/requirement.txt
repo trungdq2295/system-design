@@ -1,0 +1,28 @@
+Messenger
+
+
+Requirements:
+	- sending and receiving messages
+	- joining groups chat
+
+Out of scope:
+	- presence indicator
+	
+Back of Envelop estimation
+
+3 approaches for receiving message
+- short polling
+- long polling
+	- Cons: better rebalancing than Websocket when service is down
+	- Even so, we don't recommend this due to
+		+ Overheaded of keeping connection TCP
+		+ High TCP connection
+		
+- web sockets
+
+3 approaches for CDC
+- DB triggers
+- DB subscribe to the brokers
+- 2 calls from the send server
+	- 1 to DB
+	- another to  broker

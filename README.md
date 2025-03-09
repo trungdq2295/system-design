@@ -15,6 +15,7 @@
 * [Batch Promotion Email](https://github.com/trungdq2295/system-design/tree/main/batch-promotion-email)
 * [Ad Click Aggregator](https://github.com/trungdq2295/system-design/tree/main/ad-click-aggregator)
 * [Inventory Management](https://github.com/trungdq2295/system-design/tree/main/inventory-management)
+* [Facebook Messenger](https://github.com/trungdq2295/system-design/tree/main/facebook-messenger)
   
 #
 * P/s: I might not be able to provide all setup so feel free to email me at trungdq2295@gmail.com if you have any problem on starting project or found any bug.
