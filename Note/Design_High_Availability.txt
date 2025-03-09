@@ -1,0 +1,31 @@
+Design high availability
+	Start to think: What can fail, it will fail
+	Rule Number 1:
+		Operate a system at a steady load whenever possible
+		For example: System with caches
+			Serve request from the cache (if possible)
+			On cache hit, send a request to the datasource anyway
+			Why?
+			Think about the scenario your system is serving 3k RPS and your cache server goes down ( or anything happen to your cache such as cold cache)
+			Your datasource has to server 3k RPS since the request will be kept sent
+			and if it couldn't, your system will down
+	Rule Number 2:
+		When you build complicated system, do not build them from complicated or build them as complicated monolith, build them as simple parts
+		Because: Simple part come with simple failure, you can fix it
+		If there's bug on your production, just rollback. Your customer shouldn't notice those changes
+	Rule number 3:
+		Compatibility is everything
+		It's pointless to deploy your code if your client and server has tight dependencies between versions
+		This means, even when you upgrade your system, client does not need to do anything
+	At scale, your system will do the same thing over, over, and over again
+	Rule number 4:
+		Eliminate variance, where possible
+	Rule number 5:
+		Divide and Conquer
+	Rule number 6:
+		Request Hedging
+			This mean to make 2 request to two different database nodes (in parallel)
+			And which is response first, we gonna take that and ignore the another one
+		Don't adjust the timeout. Because:
+		    Increase timeout can increase latency which degrades user experience
+		    Resource exhaustion as connections, thread or memory for extend periods
