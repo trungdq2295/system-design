@@ -1,0 +1,17 @@
+Maintainability
+  It's about making life better for engineering and operations teams who need to work with system
+  Good abstraction can help reduce complexity and make the system easier to modify and adapt for new use cases
+  Good operability means having good visibility into the system's health, and having effective ways of managing it
+  We can and should design software in such as way that it will hopefully minimize pain during maintenance
+  3 design principles:
+    Operability
+      Make it easy for operations teams to keep the system running smoothly
+    Simplicity
+      Make it easy for new engineers to understand the system, by removing as much complexity as possible from the system. (Note this is not the same as simplicity or the user interface)
+    Evolvability
+      Make it easy for engineers to make changes to the system in the future, adapting it for unanticipated use cases as requirements change.
+      Also know as extensibility, modifiability, or plasticity
+
+  Operability
+    Good operations can often work around the limitation of bad(or incomplete) software, but good software can not run reliably with the bad operations
+

@@ -1,0 +1,4 @@
+Scalability
+  It means having strategies for keeping performance good even when load increase
+  Always ask yourself: what happens if our load/RPS doubles ?
+  How do we maintain good performance even when our load parameters increase by some amount

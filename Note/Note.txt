@@ -1,6 +1,6 @@
 System Design	
 	Clarify
-		Don't assume but to ask interviewer to clarify what htey want
+		Don't assume but to ask interviewer to clarify what they want
 		Example: 
 			Is this mobile app? or web app? or both
 			What is the most important feature

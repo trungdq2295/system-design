@@ -1,0 +1,12 @@
+Reliability
+  It means the system will continue to work correctly, even when things go wrong
+  Thing can go wrong are called faults and system that anticipate faults and can cope with them are called fault-tolerant or resilient
+  Fault is not the same as a failure
+    Fault is usually defined as one component of the system deviating from its spec,
+      An abnormal condition that may or may not lead to a failure
+      Can be hardware-related or software-related ( bug in code)
+    Failure is when the system as a whole stop providing required service to the user
+      observable incorrect behavior
+      Example: app crash when code is run
+
+    You can't reduce the probability to a fault to zero. so it's good to design a fault-tolerance system that prevent faults from causing failutres
