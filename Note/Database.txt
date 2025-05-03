@@ -1,0 +1,81 @@
+
+NoSQL
+  This type of databases typically don't enforce a schema for the data they store, which can make it easier to adapt applications to changing requirements
+  However, it still assumes data has a certain struct, it's just a question of whether the schema is explicit(enforced on write) or implicit (handled on read)
+
+
+Document-based DB
+  Stored as a JSON-based data which is very flexible to your datastructures
+  If your application has mostly one-to-many relationships (tree-structured data) or no relationships between records, the document model is appropriate
+  Document databases target use cases where data comes in self-contained documents and relationships between one document and another are rare.
+
+Graph-based DB
+  Stored data like a graph (vertex and edge)
+  we use this when you have so many-to-many relationships
+  For a graph query: it's really simple to do a recursive query such as few line
+  But for a traditional sql query: it's really complicated, maybe upto 30 line or more
+  The idea is to pick a data model that is suitable for your application
+  Use cases: where anything is potentially related to everything (many-to-many relationships)
+  Example:
+    MATCH
+     (person) -[:BORN_IN]-> () -[:WITHIN*0..]-> (us:Location {name:'United States'}),
+     (person) -[:LIVES_IN]-> () -[:WITHIN*0..]-> (eu:Location {name:'Europe'})
+    RETURN person.name
+
+CODASYL
+  Network Model
+  Similar to graph but less efficient
+
+Triple-Stores model
+  data is stored in the form of very simple three-part statement: (subject, predicate, object)
+  The idea is really similar to graph
+    For example, (lucy, age, 33) is like a vertex lucy with properties {"age":33}.
+  The reasoning behind this design that you should be able to combine your data with someone else's data.
+    And if they attach a different meaning to the word, you won't get conflict
+  SPARQL is a query language for triple-stores using the RDF data model
+  Example:
+    PREFIX : <urn:example:>
+    SELECT ?personName WHERE {
+     ?person :name ?personName.
+     ?person :bornIn / :within* / :name "United States".
+     ?person :livesIn / :within* / :name "Europe".
+    }
+
+Datalog
+  Similar to triple-stores but instead of storing data as (subject, predicate, object), it stores data as predicate(subject, object)
+  Example:
+    Storing data
+      name(namerica, 'North America').
+      type(namerica, continent).
+      name(usa, 'United States').
+      type(usa, country).
+      within(usa, namerica).
+      name(idaho, 'Idaho').
+      type(idaho, state).
+      within(idaho, usa).
+      name(lucy, 'Lucy').
+      born_in(lucy, idaho).
+    Query data:
+      within_recursive(Location, Name) :- name(Location, Name).  // Rule 1
+      within_recursive(Location, Name) :- within(Location, Via), // Rule 2
+                                          within_recursive(Via, Name).
+      migrated(Name, BornIn, LivingIn) :- name(Person, Name), // Rul 3
+                                           born_in(Person, BornLoc),
+                                           within_recursive(BornLoc, BornIn), // we are using rule 1 here
+                                           lives_in(Person, LivingLoc),
+                                           within_recursive(LivingLoc, LivingIn). // rule 2 here
+      ?- migrated(Who, 'United States', 'Europe').
+      /* Who = 'Lucy'. */
+
+Log-based data
+  At the core is a log (also called append-only log)
+  so whenever we add/update the data, it appends to the log rather than being modified in place
+    => Fast in Write
+  However, for the read, it has to scan all the rows of that data in the log and retrieve the last state
+    => Which leads to O(n) time complexity and is not suitable for high read application
+  How do we avoid eventually running out of space?
+    Break the log into segments of certain size by closing a segment file when it reach a certain size,
+    We can perform compaction which means throwing away duplicate keys in the logs, and keeping only the most recent update for each key
+
+
+
