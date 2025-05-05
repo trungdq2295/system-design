@@ -1,0 +1,15 @@
+Data warehouse
+  Used for Analytic
+  There's 2 data model
+    Star Schema (or cam be called multidimensional modeling)
+      When table relationships are visualized, the fact table in the middle and surrounded by its dimension tables
+        - Just like you have a click event on a product X belong to category A at date B on platform C
+        Then you gonna use join to get related information based on those X,A,B,C ...
+      Another variation of star schema is known as snowflake schema, where dimensions are further broken down into subdimensions
+      Snowflake schema are more normalized than star schema but star schema is preferred since it's simpler to work with for analytics
+
+Column-Oriented Storage
+  Since for analytics, we mainly don't query all the column but the one we need
+  So if we use row-based database, when we query data, it will load all the columns of data from disk into memory, parse them and filter out. This can take a long time
+  The idea is simple: Don't store all values from one row together, but store all the values from each columns together instead
+    If each column is stored in separate file, a query only needs to read and parse those column that are used in that query

@@ -3,7 +3,6 @@ NoSQL
   This type of databases typically don't enforce a schema for the data they store, which can make it easier to adapt applications to changing requirements
   However, it still assumes data has a certain struct, it's just a question of whether the schema is explicit(enforced on write) or implicit (handled on read)
 
-
 Document-based DB
   Stored as a JSON-based data which is very flexible to your datastructures
   If your application has mostly one-to-many relationships (tree-structured data) or no relationships between records, the document model is appropriate
@@ -73,9 +72,39 @@ Log-based data
     => Fast in Write
   However, for the read, it has to scan all the rows of that data in the log and retrieve the last state
     => Which leads to O(n) time complexity and is not suitable for high read application
+  And also for the filter range is really not efficient like you need to filter like 'abc%' or date between 1980 and between 1990
+    => Lead to O(n) time complexity
   How do we avoid eventually running out of space?
     Break the log into segments of certain size by closing a segment file when it reach a certain size,
     We can perform compaction which means throwing away duplicate keys in the logs, and keeping only the most recent update for each key
 
+SSTable
+  Sorted String Table
+  In log-based, the data key-value pairs stored in order that they were written to disk
+  However in SSTable, these data is sorted by key
+  Some advantages:
+    + Merge segment is simple and efficient. They use merge sort algorithm to do this
+      Even if same key appears in multiple segment, we can just keep the value from most recent segment and discard the value from older segment
+    + To find a particular key, you don't need to keep an index. Since the data is sorted, you can easily find the data if you know offset its neighbor beforehand
+      Example: said you want to look for "handiwork" but you know the offset of "handbag" and "handsome". you know that you only need to scan between those offset
+    + you still need an in-memory index to tell you the offset for some keys, but it can be small since you only need to store few key and start to scan from that
+  How it stores data:
+    + When a write comes it, add it to an in-memory balanced tree structure (red-black tree) (sometimes called memtable)
+    + When memtable get bigger than the threshold - write it out to disk as an SSTable file. This new file become the most recent segment of the database.
+        While SSTable is being written out to disk, writes can continue to a new memtable instance
+    + From time to time, it runs a merging and compaction process in the background to combine these segment files and to discard overwritten or deleted value
+    + What happens if the database crashes which can cause the memtable lost?
+      - We can keep a separate log on disk to which every write is immediately append ( like the log-based).
+        That log is not in sorted order which is doesn't mater since we use it to restore the memtable after a crash
+        And after memtable is written out to disk, we can just clean the log and start to do it again for new data
+  How it handle read request:
+    + It try to find the key in memtable, then in most-recend on-disk segment and then in the next-older segment
+  Disadvantages:
+    + very slow when it looks for the key not existed in database because it gonna scan from memtable, most recent segment file, the next-older segment file, etcs
+      => Like scanning all the data
+
+OLTP
+  Online transaction processing
+  Usually use for processing transaction in low latency and high availability
 
 

@@ -1,0 +1,40 @@
+B-tree
+  it breaks the database into fixed-size blocks or pages (traditionally 4KB in size or might be bigger)
+    as disks are also arranged in fixed-size blocks.
+  The idea is each page can be identified using an address or location, which allows one page to refer to another (similar to a pointer)
+  One page is design as a root page and whenever you want to look up a key in the index, you start at root
+    For example: your root page contains:
+      + reference to page which contains key 0 - 99
+      + key 100 (leaf)
+      + reference to page which contains key 101 - 199
+      And inside each page, there's reference to another page too, until it reach the key (leaf)
+      So if we want to look up key 100, then it stop at root page
+      If want to lookup key 56, it will go to reference page 0 - 99, and then 56- 99, etc. until it reach the key 56
+  If you want to update the value for an existing key in a B-tree, you gonna search for the leaf page which contains the key, change the value and write back
+  If you want to insert new key, you need to find the page whose range contains the ney key and add it to that page
+    If the page doesnt has enough space(disk) for the new key, the page gonna be split into new half-full pages and add key to equivalent page
+      And then the parent page will be updated the reference to these 2 half-full page
+    What if the database crashes after some of pages have been written such as page split but parent page doesnt update reference?
+      B-tree includes an additional write-ahead log (WAL, also known as redo log)
+        WAL is an append-only file to which every B-tree modification must be written before it can be applied to the pages of the trees itself
+        When database came back after crashing, it use this logs to restore the B-tree back to a consistent-state
+  Most database can fit into a B-tree that is three or four levels deep
+  This B-tree always has a depth of O(logn)
+  (A four-level tree of 4 KB pages with a branching factor of 500 can store up to 256 TB.)
+
+
+Clustered Index
+  It stores the index keys (usually an id/ primary key) and entire row data => which make size larger
+  This is good for read , range scans, sorted queries application
+  But bad for write application
+     insert rows with random keys, causing frequent page splits to maintain order.
+    You update a clustered key, requiring moving the entire row (since it affects where it's stored).
+Non-clustered index
+  It stores only the index key and reference to the row data
+  slower read than cluster index
+  Good for 	Filtering/sorting on non-key columns
+
+Multi-column index
+  Also called concatenated index which is simply combines several fields into one key
+  is good if you want to look up by many fields
+  Useless if you look up by a single field
