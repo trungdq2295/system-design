@@ -1,0 +1,14 @@
+
+Binary Encoding
+  MessagePack
+    a binary encoding for JSON
+  Protocol Buffer
+    You define a schema and when you transfer the data over network, it will be encoded to binary
+    In your schema, it will have data type, label and field tags
+      such as: int32 name = 1;
+    Usually, protobuf will encode the tag "1" and data type "int32", and the value of this field
+    The label is mainly for generated code such as getter/setter function
+  Thrift
+    Similarly to protocol
+  Avro
+    More flexible, since it doesn't require you to init a "tag" for each field

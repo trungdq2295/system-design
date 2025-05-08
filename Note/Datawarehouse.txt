@@ -13,3 +13,6 @@ Column-Oriented Storage
   So if we use row-based database, when we query data, it will load all the columns of data from disk into memory, parse them and filter out. This can take a long time
   The idea is simple: Don't store all values from one row together, but store all the values from each columns together instead
     If each column is stored in separate file, a query only needs to read and parse those column that are used in that query
+  Sort Order
+    Usually, we define the sort column when we create a table
+      And the higher column, the more complicated compressions

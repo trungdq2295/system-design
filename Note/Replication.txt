@@ -1,0 +1,35 @@
+Replication
+  Can server several purposes
+    High availability
+      Keep the system running even when one machine goes down
+    Disconnected operations
+      Allowing an application to continue working when there is network interruption
+    Latency
+      Placing the database geographically close to the users, so user can interact with it faster
+    Scalability
+      Being able to handler higher volume of reads than a single machine could handle by performing read on replicas
+  Consistency models which are helpful for deciding how an application should behave under  replication lag:
+    Read-after-write
+      Users should always see the data that they have submitted themselves (sticky session load balancing to route user to right nodes))
+      Happened after you write your own data
+    Monotonic Reads
+      After users have seen the data at point in time, they shouldn't later see the data from some earlier point of time ( sticky session dude)
+      It means if you read that data at version 5, you will never be able to read the older data at version 4,3,..
+      Happened after you read the data which can be written by anyone
+    Consistent prefix reads
+      Users should see the data in a state that makes casual sense:
+      For example, seeing a question and its reply in correct order
+
+Single-leader replication
+  Clients send all writes to a single nodes (leader), which send a streams of data change event to other replicas (followers).
+  Reads can be performed on any replica, but reads from follower might be stale
+
+Multi-leader replication
+  Clients send each write to one of server leader nodes, any of which can accept writes. THe leaders send streams of data change event to each other and to any followers nodes
+
+Leaderless replication
+  A write will go to all the node in parallel (instead of 1 node)
+  However, what if 1 of the node fail to get the write? how can we make the data consistency?
+  We can do the Dynamo-database styles
+    We can validate by when reading the data, we send the read to multiple node in parallel and based on the version. We can detect the stale data and update it
+    Or we can hava background job to scan for the stale data
