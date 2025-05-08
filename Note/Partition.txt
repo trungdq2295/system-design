@@ -1,0 +1,27 @@
+Partitioning
+  Two main approaches to partitioning a database with secondary indexes:
+    Document-based partitioning
+    term-based partitioning
+  Document-based partitioning
+    For example: you have split your table by the id which range from 1~500, 501 ~ 1000,..
+    In this index approach, each partition is completely: each partition maintains its own secondary indexes, covering only the document in that partition(local index)
+    For example:
+      you have car id 300, 380 and 700 has color red
+      and partition 0 includes 300, 380, partition 1 includes 700
+      => partition 0 has secondary indexes with 300 and 380, while partition 1 has secondary includes 700
+    Whenever you need to write to the database (add, remove, update) you only need to deal with the partition which contains the ID you are writing
+  Term-based
+    rather than each partition having it own secondary index (local index), we can construct a global index that cover all data in partitions
+    However we don't store the global index in a single node which can cause bottleneck, but also partition this global index into multiple node
+    This global index (term-based) make the reads more efficient
+    Disadvantages is the writes are slower and more complicated
+      because a write to a single document may now affect multiple partition of the index
+    => Update in global index are often asynchronous
+
+
+  Rebalance partition
+    No matter which strategy we use, rebalance is usually expected to meet some minimum requirements:
+      After rebalancing, the load (data storage, read and write requests) should be shared fairly between the nodes in the cluster
+      While rebalancing is happening, the database should continue accepting reads and writes
+      No more data than necessary should be moved between nodes, to make rebalancing fast and to minimize the network and disk I/O load
+    Strategies for Rebalancing
