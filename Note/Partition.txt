@@ -1,4 +1,22 @@
 Partitioning
+  Is necessary when you have so much data that storing and processing it on a single machine is no longer feasible
+  The goal is to:
+    spread data
+    query load evenly across multiple machines
+    avoiding hotspots
+  Two main approaches to partitioning:
+    Key Range partitioning:
+      Where key are sorted, and partition owns all the key from some minimum up to some maximum
+      Advantages:
+        Efficient range queries are possible
+      Disadvantages
+        Risk of hot spots
+    Hash partitioning
+      Where hash function is applied to each key, partition own a range of hashes
+      Advantage:
+        Distribute the load evenly
+      Disadvantage:
+        Destroy the order of data
   Two main approaches to partitioning a database with secondary indexes:
     Document-based partitioning
     term-based partitioning
@@ -17,11 +35,36 @@ Partitioning
     Disadvantages is the writes are slower and more complicated
       because a write to a single document may now affect multiple partition of the index
     => Update in global index are often asynchronous
-
+  Consistent hashing,
+    which is designed to minimize data movement when nodes are added or removed.
 
   Rebalance partition
     No matter which strategy we use, rebalance is usually expected to meet some minimum requirements:
       After rebalancing, the load (data storage, read and write requests) should be shared fairly between the nodes in the cluster
       While rebalancing is happening, the database should continue accepting reads and writes
       No more data than necessary should be moved between nodes, to make rebalancing fast and to minimize the network and disk I/O load
+    How not to do it: hash mod N
+      The idea is to divide the possible hashes into ranges and assign each range to a partition which 0 <= hash(key < b
+      This is good until you add more node, then the partition need to move
     Strategies for Rebalancing
+      Fixed number of partition
+        Create more partitions than there are nodes
+        If a new node is added, it just simply steal a few partition from every existing node until partition are fairly distributed between nodes
+        Choosing the right number of partitions is difficult
+            If partition are too large, rebalancing and recovery from node failure become too expensive
+            If it's too small, they incur too much overhead
+            The best is to achieve when the size is "just right", neither too big or to small
+      Dynamic partition
+        Partition increase when the data in a partition exceed a configured size
+      Partitioning proportionally to nodes
+        Number of Partitions is similar to number of nodes => which mean to have fixed number of partitions per node
+      Rebalance Automation or Manual?
+        Automation is good but when there's issue such as network corruption, which can cause your database down
+        Manual is more task to do but you can control the rebalance
+  Request Routing
+    You need to route a request from the same client to the same nodes. If you don't, client will see the stale data
+    Many distributed data system rely on a separate coordination such as ZooKeeper
+      Whenever a partition changes ownership, or a node is added or removed, ZooKeeper notifies the routing tier so that it can keep its routing information up to date.
+      Many database such as Hbase, kafka (version 3.0 no longer use) use Zookeeper
+    Cassandra and Riak take different approach: gossip protocol
+      Which remove the dependence on external service but increase complexity in the database node
