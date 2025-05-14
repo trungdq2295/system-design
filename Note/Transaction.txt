@@ -1,0 +1,23 @@
+Transaction
+  In the harsh reality of data system, many thing can go wrong:
+    The database software or hardware may fail at any time (including in the middle of operation)
+    The application may crash at anytime (including halfway through a series of operations
+    Interruptions in hte network can unexpectedly cut off the application
+    Several clients may write to the database at same time, overwriting each other's changes
+    A client may read data that doesn't make sense because it has only partially been updated
+    Race conditions between client can cause surprising bugs
+  In order to be reliable and fault-tolerance, the system need to deal with this
+  And the most simple solution is to use transaction
+  ACID
+    Atomic: Which means if the transaction cannot be completed (committed) due to a fault, then the transaction is aborted
+
+
+  Isolation
+    Snapshot:
+      Each transaction sees a consistent snapshot of the database as of the time it started. This means:
+        It ignores update made by other transaction that start after it
+        It ignores update not commited yet by other transaction
+      If there're 2 transaction modify same row, and both try to commit, the one commit first will succeed and another will be aborted
+      How index work in Snapshot?
+
+
