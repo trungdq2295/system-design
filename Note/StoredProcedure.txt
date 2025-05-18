@@ -1,0 +1,7 @@
+Stored Procedure
+  Bad reputation:
+    Code running in database is difficult to manage: compared to an application, it's hard to debug or to keep version control
+    Database is often much more performance-sensitive than application server because a single database instance is often shared by many application
+      A badly written stored procedure (e.g, using a lot of CPU/ memory time) in a database can cause much more trouble
+  However in the modern database, you can just use programming language such as Java to create Store Procedures
+  And data is kept in memory so the SP is quite fast since we don't need any I/O operation

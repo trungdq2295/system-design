@@ -10,14 +10,105 @@ Transaction
   And the most simple solution is to use transaction
   ACID
     Atomic: Which means if the transaction cannot be completed (committed) due to a fault, then the transaction is aborted
-
-
+    Consistent:
+    Isolation: concurrently executing transaction are isolated from each other: they cannot be step on each other's toes
+    Durability: to prove a safe place where data can be stored without fear of losing it.
+      Is the promise that once a transaction has committed successfully, any data it has written will not be forgotten
+  Race conditions in DB:
+    Dirty Reads mean you read the data from other transaction which has not been commited yet
+    Dirty write is similar to dirty read but in context of write
+    Read skew (non repeatable read)
+      client see different parts of the database at different point in time
+    Write skew
+      A transaction reads something, make decision based on the value it saw and writes the decision to the database
+      however by the time the write is made, the premise of the decision is no longer true. Only serializable isolation prevent this
+    Repeatable Read:
+      Means if a transaction reads the same row multiple times, it will see the same data everytime - even if there's another transaction modifies that row
+    Lost Update:
+      A lost update happens when two transactions read the same row, then both update it — but one of the updates is overwritten and lost.
+    Phantom Read:
+      A new row that wasn't there before during the first query in a transaction but shows up later due to a write by another transaction
+      We can't use "select for update" in this case since we don't know which row to lock
+      How to prevent this:
+        We can create an extra table and insert data there so we can assume it already exist in the database
+        So when there's someone want to do something, they will try to modify that row which we can use select for update to lock the row
+        Pros: sovle the phantom problem
+        Cons: more complexity, more table to handle
+        We only do this unless we have no choice. A serializable isolation level is much preferable in most cases
   Isolation
+    Isolation is unfortunately not that simple. Serializable isolation has a performance cost, and many databases don't want to pay that price
+    Several isolation level
+      Read committed
+        When reading the database, you only can read the commited database
+        When writing to the database, you only overwrite the data which has been commited to the database
+        Read committed is a very popular isolation level. It is the default setting in Oracle 11g, PostgreSQL, SQL Server 2012, MemSQL
+        Usually use row-level locked to prevent it
+          This mean, when you access a row, you gonna acquire a lock on it first
+          And you hold the lock until the transaction is commited/aborted,
+        Cons:
+          A transaction which read the same row data 2 times, can see different data
+          How to resolve this? use snapshot isolation
+          The idea is that each transactions reads from a consistent snapshot
+          This mean when a transaction can see a consistent snapshot database, frozen at particular time
     Snapshot:
       Each transaction sees a consistent snapshot of the database as of the time it started. This means:
         It ignores update made by other transaction that start after it
         It ignores update not commited yet by other transaction
+    Serializable Isolation
       If there're 2 transaction modify same row, and both try to commit, the one commit first will succeed and another will be aborted
-      How index work in Snapshot?
+      This is usually regarded as the strongest isolation level
+      But if this is so good, why not everyone use it?
+      Most database provide this isolation use one of three techniques:
+        Literally executing transaction in serial order - Actual Serial Execution
+        Two-phase locking, which for several decades was the only viable option
+        Optimistic concurrency control techniques such as serializable snapshot isolation
+      Actual Serial Execution
+        simplest way to remove the concurrency entirely: is to execute only one transaction at a time, in serial order, on a single thread
+        But what if your database has so many data? your single threaded can be bottleneck
+          => The idea is to use multiple core CPU
+            and partition your data
+            and assign each core to each partition
+            Example: TiDB, CockroachDB
+        Summary:
+          Every transaction must be small and fast because one slow transaction can affect all other transaction
+          It is limited to use cases where the active dataset can  fit in memory. If you move data to disk, then the single-threaded transaction will be slow since it's I/O operation
+          Write throughput must be low enough to be handled on single CPU core
+          Cross-partition transaction are possible, but there's hard limit to the extent to which they can use to
+      Two-phase locking
+        Allowed to concurrently read the same object as long as nobody is writing to it
+        But as soon as anyone wants to write to an object, exclusive access is required:
+          If transaction A has read an object and transaction B want to write to that object, B must wait for A commit or abort before can continue(prevent B cant' change the data which can make A behavior unexpected)
+          If transaction A has written an object and transaction B want to read it, B must wait until A commit or abort (prevent reading old version)
+        This is good but the performance's really bad. One slow transaction can affect the system
+        There's many way to lock
+          Index-range locks
+            Lock a row by specific range
+              For example: you want to book room 123 from 1pm-2p.m. you can just simply just lock the room 123 all day or you can just lock all room between 1pm-2pm
+                So if there's another transaction want to insert/update, it has to wait for your transaction to be done
+            However, If you don't have a suitable index where a range lock can be attached, the database can fall back to a shared lock on the entire table which isn't good since it can block all other transaction
+      Serializable snapshot isolation
+        It's the fundamental of Optimistic locking
+        The advantages of this is it doesn't need to block waiting for locks held by anther transactions
+          Which makes query latency much more predictable and less variable
 
+    How index work in multi-version database?
+      One option is to have the index simply point to all versions of an object and require an index query to filter out any object version that are not visible to current transaction
+        When Garbage Collection remove the old version, it can also remove these corresponding index
+      In PostgreSql
+        Every row lives in the heap ( which is the main table storage)
+        When a row is updated, Postgre insert a new row and marks the old one as dead (but doesn't delete immeidately)
+        Indexes point to the physical location of tuple in the heap
+        If a row is updated without changing any indexed column, it will
+          Insert the new version of the row on the same heap page
+          Reuse the existing index entry instead of creating new one
+            => avoids updating index
+            However, the index still point to old one. But this is still great since postgre decouple the system
+            When a query run on index, it will reach the original first to get the data by the index
+            And then follow the HOT update to find the newest version that's visible to the current transaction
+      Another approach is append-only b-trees
+        When data is updated, pages of the B-trees are copied (not overwritten)
+        The parent page are also copied and updated to point to new version
+        Unchanged pages are left as-is (immutable)
+        Tradeoffs:
+          This method need compaction and GC process in the background to clea up old versions and free space
 
