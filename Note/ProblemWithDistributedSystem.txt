@@ -1,0 +1,5 @@
+Failure with Network
+  When you make a request/response over the network, everything can go wrong
+  We have some solution:
+    Timeout
+      

@@ -1,0 +1,13 @@
+Network
+  The internet and most internal network in data centers (often Ethernet) are asynchronous packet network
+  One node can send a message (package) to another node, but the network gives you no guarantees as to when it will arrive or whether it will arrive
+  If you send a request, many thing can go wrong:
+    Your request may have been lost (someone unplugged a network cable)
+    Your request maybe waiting in queue and will be delivered later (perhaps the network or the recipient is overloaded)
+    The remote node may have failed (it crashed or it slowed down)
+    The remote node may have temporarily stopped responding. But it will start responding again later
+    The remote node may have processed your request, but the response has been lost oon then network
+    The remote node may have processed your request, but the response has been deployed and will be delivered later
+  The sender can't even tell whether the packet was delivered: the only option is for the recipient to send a response message
+
+  You do need to know how your software reacts to network problems and ensure that the system can recover from them
