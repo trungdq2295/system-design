@@ -1,0 +1,15 @@
+Consensus
+  Means getting several nodes to agree on something
+  can be formalized as: one or more nodes may propose values, and the consensus algorithm decides on one of those value
+  a consensus algorithm must satisfy the following properties:
+    Uniform agreement
+      No two nodes decide differently
+    Integrity
+      No node decide twice
+    Validity
+      If a node decides value v, then v was proposed by some node
+    Termination
+      Every node that does not crash eventually decides some value
+  The uniform agreement and integrity define the core idea of consensus.
+  The validity make sure the data agree is valid
+  Termination define the idea of fault tolerance - making sure there's always a node to decide some value
