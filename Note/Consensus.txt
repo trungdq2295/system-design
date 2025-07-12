@@ -13,3 +13,31 @@ Consensus
   The uniform agreement and integrity define the core idea of consensus.
   The validity make sure the data agree is valid
   Termination define the idea of fault tolerance - making sure there's always a node to decide some value
+
+  Epoch numbering and quorum
+    A concept to making sure the safety and liveness in leader election
+    Take example Kraft in Kafka: we have 3 node A, B, C and A is leader
+      Each node gonna have a epoch number which is used to define leader
+      Scenario: A crashes,
+        B gonna increase its epoc and start voting
+        C see that vote and then accept B gonna be the new leader
+        => C will increase its epoch to be the same as B
+        Once A is alive, A will detect B is new leader and also increase A' epoch number to be the same as B
+        What if B and C start to elect themselves as leader at same time?
+        It's rare to have this case since Kraft implementation random time to start voting leader elect on eah node
+        For example: node B can start a 150ms and node C can start at 250ms
+        But if this happen
+        System will detect it reaches the quorum so the leader election will be canceled
+          This is to prevent the split brain problem
+        And start the new election again
+
+  Why service like Zookeeper is used?
+    It contains set of features that turn our to be useful when building distributed systems:
+      Linearizable atomic operations
+        Such as compare-and-set operation
+      Total ordering of operation
+      Failure Detection
+        If the session expires or disconnects, it is assumed the client has failed.
+      Change notification
+        Client can also watch them for changes and can findout when another client join the cluster or if another client fails
+
