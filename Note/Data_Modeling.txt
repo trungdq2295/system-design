@@ -1,0 +1,38 @@
+Data Modeling
+    A data model defines how your data is:
+        - structured
+        - stored
+        - related
+    In summary, it's how you define your data model like what entities or model exist
+        And how they relate or connect to another
+    Usually, there will be 6 stages in system design
+        - Requirement
+        - Core Entities: What entities(tables) exists
+        - API/Interfaces
+        - Data Flow
+        - High-level design: How they're stored, related, etc
+        - Deep dives
+        We will mainly focus on stage core entities and high-level design
+
+    Database Model Options
+        Relational DB
+        Document DB
+        Key-value DB
+        Graph DB
+    Relational DB
+        Traditional way to store your data
+    Document DB
+        The main reason you use this document is that you don't know what kind of data you gonna store so mainly for schema flexibility
+        However, you can't use join and might need to denormalize data
+    Wide column DB
+        Every row doesn't have to be has the same column data structure
+        It's good for write once, read many because it uses append log
+    Graph DB
+        Your data linked to each other by a value
+        It's really not recommended to use this type of DB
+    Schema Design
+        3 keys factor:
+            Data Volume: Where can data live (single DB vs distributed)
+            Access pattern: How is data queried? (drives indexes & structure)
+            Consistency requirement: How strict? (ACID vs eventual consistency)
+
