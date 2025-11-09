@@ -9,5 +9,45 @@ Network
     The remote node may have processed your request, but the response has been lost oon then network
     The remote node may have processed your request, but the response has been deployed and will be delivered later
   The sender can't even tell whether the packet was delivered: the only option is for the recipient to send a response message
+  When you make a phone-call, it's  circuit-switched network since we can guess how many packet we need to reserve and then transfer
+  However, in TCP connection, it doesnt work like that because it need to handle a burst traffic. so it follow packet-switched network which is optimzied for that
+  Because when we open a web browser, we don't know how large or small it is, so we can't guess the size
+  Thus, using circuits for bursty data transfers wastes network capacity and makes transfers unnecessarily slow.
+  By contrast, TCP dynamically adapts the rate of data transfer to the available network capacity.
+
+Clock
+  Computers use a quartz crystal oscillator to keep time.
+  Quartz is cheap but not perfect, it can run a little fast or slow
+  So sometimes, your clock isn't right and the OS such as windowOS has a way to correct it
+    So it uses a time synchronization service like: NTP (network time protocol)
+    It periodically contact a trusted time server (local or remote server)
+  Spanner has a clock like [earliest, latest] so when two concurrent transaction happen,
+    It check the intervals if they're overlapped such as
+      A = [Aearliest, Alatest] and B = [Bearliest, Blatest]
+      those two intervals do not overlap (i.e., Aearliest < Alatest < Bearliest < Blatest), then B definitely happened after A—there can be no doubt.
+
+System model
+  we define a system model, which is an abstraction that describes what things an algorithm may assume
+  3 system models are in common use:
+    Synchronous model
+      This assumes bounded network delay, bounded process pauses, and bounded clock error
+      Which mean the package will arrive in time at fixed-delay
+      This is not realistic model of most practical system dude to unbounded delays and pause do occur
+    Partially Synchronous model
+      behave like synchronous model most of the time but it sometime exceeds the bound for network delays, process pauses, clock drift
+    Asynchronous model
+      An algorithm is not allowed to make any timing assumptions
+  Node failure
+    Three most common system model for nodes are:
+      Crash-stop-fault
+        This means the node stops responding at any moment, and thereafter that node is gone forever - it never comes back
+      Crash-recovery fault
+        We assume nodes may crash at any time, and perhaps start responding again after some unknown time
+      Byzantine (arbitrary) faults
+        Nodes may do absolutely anything, including trying to trick and deceive other nodes
+  For modeling real system, the partial synchronous model with crash-recovery fault is generally the most useful model
+  Sometimes, we do have to make some assumptions about faults that can and cannot happens.
+    However, in real implementation may still have to include code to handle the case where something happens that was assumed to be impossible because something which is wrong, can damge your system
+
 
   You do need to know how your software reacts to network problems and ensure that the system can recover from them
