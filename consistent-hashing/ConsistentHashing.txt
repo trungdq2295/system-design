@@ -1,0 +1,5 @@
+Consistent Hashing
+    Problem with %N hashing
+        Decide storage by hash(key) % N with N = number of servers
+        When N changes (server added or dies), the divisor changes -> all most All eky remap -> massive data movement (like hashmap)
+    Consistent Hashing help to resolve this problem by minimizing the impact from moving N data to moving 1/N data
