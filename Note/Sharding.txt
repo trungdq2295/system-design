@@ -1,0 +1,52 @@
+Sharding
+  Why
+    When your data get too large, you need to add sharding which is to split table into smaller chunk and stores on different node of database
+  How to shard your data?
+    What to shard by
+      The field that we use to group our data, usually called shard key
+      How we can decide a good shard key?
+        What column we use to shard and why?
+        The good shard key has 3 properties
+          High cardinality: The field has many unique value. The more data, the easier we can find
+          Even distribution: The data in each shard is equally
+          Align with queries: We shard on the column we used the most in the query
+    How to distribute data
+      It's a mapping a shard key values to a given machine to a given database
+      Range based
+        The data is distributed based on the range of value
+          For example: 
+            + user with id from 1 -> 20M will be in node 1,
+            + user with id from 20M -> 40M will bei n node 2
+      Hash based
+        It's work like a hashmap
+        You used a hash function to distribute your data across machine
+        However, if you add/remove a new node, you need to re-distribute your data. And it can be worse
+      Consistent Hashing
+      Directory-Based sharding
+        Use a look-up table to define where you want to store your data
+        It's like you create table in your database/redis any storage thing to store this mapping and then get the shard address based on data
+        The good thing is you can implement the customer logic into this sharding
+        Cons:
+          You need to make 2 request which is to query look-up table and to the sharding -> increase latency
+          Single pont of failure. If look-up table is failed, you don't know where your data is to query
+  Challenge of sharding
+    Hotspot
+      For example, a famous user is posting on facebook and many people will react their post while the other user's post isn't
+      Solution:
+        Compound shard key: you need to determine which data is causing the Hotspot. From example above, it should be the their post since people're reacing on user's spot
+        => you can combine post_id, user_react_id or
+        Has a dedicated shard for famous people: IT's like you create a single very strong machine to store the data for famous user.
+          This can apply if you're using Directory-Based sharding
+    Cross-shard operation
+      The query need data from more than 1 shard. This usually happens when you don't shard ur data carefully
+      Solution:
+        Caching:
+          You cache those expensive query
+        Denormalize your data
+    Maintaining Consistency
+      Cross Transaction due to the data in different shard
+      For example: Bob transfer money to Alice. Bob and Alice're on both different shard
+      Solution:
+        2 Phase Commit
+        Try to avoid cross transaction as much as possible
+        Saga Pattern
