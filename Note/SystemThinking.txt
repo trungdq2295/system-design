@@ -1,0 +1,21 @@
+System
+  Is not just a bunch of parts put together but its is a pattern of how those parts affect each other over time
+  Change one part and other parts react
+  Miss a connection and the pattern breaks
+  Let think it's of it like an orchestrator
+    System is a music
+    AI can play any instrument on demand: violin, guitar, piano...
+    Someone has to know how these parts fit together, or when the string should hold back ...
+    => that's the conductor
+  System thinking comes down with 3 question
+    Where does the state live?
+      Who own the truth of system?
+      If 2 pieces think they own it, you already have a bug
+    Where does the feedback live
+      What tell you did system work? How do you know?
+        Any metric, log, errors
+        If nothing tell you this, then system isn't working. It just pretends to work
+    What breaks if I delete this?
+      Can you trace the blast radius of any component of the system in your head before you touch it?
+
+
