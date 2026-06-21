@@ -17,5 +17,18 @@ System
         If nothing tell you this, then system isn't working. It just pretends to work
     What breaks if I delete this?
       Can you trace the blast radius of any component of the system in your head before you touch it?
+  4 ways to train your system thinking
+    Design before you prompt
+      Take a note and draw a box to describe your data flow.
+      Mark where state lives, where failure surfaces
+      If we can't draw it, we really don't understand and AI will build whatever it want
+    Spec as scaffolding
+      Write the what and why before AI do the how
+      Even with the short spec where you define a problem, a constraints, failure mode ....
+    Deletion test
+      Run a test where you delete a component and ask yourself how wrong it can be and the blast radius
+    Study the generated code
+      Don't just accept the code but ask AI to walk you through it
+
 
 
