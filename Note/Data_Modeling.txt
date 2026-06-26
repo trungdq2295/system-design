@@ -27,6 +27,7 @@ Data Modeling
     Wide column DB
         Every row doesn't have to be has the same column data structure
         It's good for write once, read many because it uses append log
+          Write once mean you rarely change the records and it is different from high traffic write
     Graph DB
         Your data linked to each other by a value
         It's really not recommended to use this type of DB
