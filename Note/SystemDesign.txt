@@ -1,0 +1,14 @@
+System Design
+  Requirement
+    Always ask for functional requirement to minimal the scope we need to do
+      Like the use case
+    Non functional requirement for system
+      Ask for request per second
+      Latency
+      High availability
+      Peak traffic
+    Ask what is our user persona, (in the same country or cross region)
+  Design
+    Remember to start with the API first -> Database -> High level architecture
+    After that, we gonna move to scalability
+    When we scale the app, especially horizontally
