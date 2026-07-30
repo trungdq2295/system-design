@@ -20,6 +20,7 @@ Design high availability
 	At scale, your system will do the same thing over, over, and over again
 	Rule number 4:
 		Eliminate variance, where possible
+		  which mean do not try to store your data in different server if possible
 	Rule number 5:
 		Divide and Conquer
 	Rule number 6:

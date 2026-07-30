@@ -10,7 +10,7 @@ Network
     The remote node may have processed your request, but the response has been deployed and will be delivered later
   The sender can't even tell whether the packet was delivered: the only option is for the recipient to send a response message
   When you make a phone-call, it's  circuit-switched network since we can guess how many packet we need to reserve and then transfer
-  However, in TCP connection, it doesnt work like that because it need to handle a burst traffic. so it follow packet-switched network which is optimzied for that
+  However, in TCP connection, it doesnt work like that because it need to handle a burst traffic. so it follow packet-switched network which is optimized for that
   Because when we open a web browser, we don't know how large or small it is, so we can't guess the size
   Thus, using circuits for bursty data transfers wastes network capacity and makes transfers unnecessarily slow.
   By contrast, TCP dynamically adapts the rate of data transfer to the available network capacity.

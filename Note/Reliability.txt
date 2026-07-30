@@ -9,4 +9,4 @@ Reliability
       observable incorrect behavior
       Example: app crash when code is run
 
-    You can't reduce the probability to a fault to zero. so it's good to design a fault-tolerance system that prevent faults from causing failutres
+    You can't reduce the probability to a fault to zero. so it's good to design a fault-tolerance system that prevent faults from causing failures
