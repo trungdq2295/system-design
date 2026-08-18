@@ -1,0 +1,22 @@
+Real time messaging protocol
+  a protocol commonly used to push an encoded live stream from a broadcaster into the streaming infrastructure
+  It's usually not what our phone/browser uses to watch the stream anymore.
+  IT's an ingestion protocol
+  Why we use it over HTTP?
+    HTTP was designed for request/response communication
+    Live stream has different requirement where the client continuously send  media to server
+    RTMP was designed for this of persistent, real-time media connection
+    Conceptually
+      TCP Connection:
+        video -> audio -> video ->video > audio
+    Rather than
+      request file -> response -> connection end -> request another file ....
+    RTMP runs over TCP
+      reliable delivery
+      ordered packets
+      re-transmission
+      congestion control
+  When should we use it
+    Live streaming with high quality
+  Tradeoff
+     Few seconds latency
