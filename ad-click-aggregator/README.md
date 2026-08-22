@@ -17,7 +17,7 @@ To be Updated
 * Springboot 3.1.10
 
 ## System Design
-![System Design](https://github.com/trungdq2295/system-design/blob/main/ad-click-aggregator/system.png)
+![System Design](system.png)
 
 ## Set up
 To be Updated

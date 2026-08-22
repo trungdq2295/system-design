@@ -21,7 +21,7 @@ A system aims to help user to find the nearest business shop they need
 * Maven
 
 ## System Design
-![System Design](https://github.com/trungdq2295/system-design/blob/main/proximity-system/proximity.png)
+![System Design](proximity.png)
 
 ## Set up
 * You can use docker to set up the database ( this is not requirement, just an optional)

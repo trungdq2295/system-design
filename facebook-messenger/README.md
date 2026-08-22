@@ -8,5 +8,5 @@
 
 
 ## System Design
-![System Design](https://github.com/trungdq2295/system-design/blob/main/facebook-messenger/system.png)
+![System Design](system.png)
 
