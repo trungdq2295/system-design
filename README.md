@@ -16,6 +16,9 @@
 * [Ad Click Aggregator](https://github.com/trungdq2295/system-design/tree/main/ad-click-aggregator)
 * [Inventory Management](https://github.com/trungdq2295/system-design/tree/main/inventory-management)
 * [Facebook Messenger](https://github.com/trungdq2295/system-design/tree/main/facebook-messenger)
+* [Twitch](https://github.com/trungdq2295/system-design/tree/main/twitch-system)
+* [Locker Service](https://github.com/trungdq2295/system-design/tree/main/locker-service)
+* [Consistent Hashing](https://github.com/trungdq2295/system-design/tree/main/consistent-hashing)
   
 #
 * P/s: I might not be able to provide all setup so feel free to email me at trungdq2295@gmail.com if you have any problem on starting project or found any bug.
