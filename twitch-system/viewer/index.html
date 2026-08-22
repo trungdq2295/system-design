@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stream Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #eee; background: #111; }
+    video { width: 720px; max-width: 100%; background: #000; border-radius: 8px; }
+    pre { white-space: pre-wrap; background: #1e1e1e; padding: 1rem; border-radius: 8px; }
+    input, button { padding: .5rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Stream Viewer</h1>
+
+  <p>
+    Stream id:
+    <input id="stream-id" type="number" value="1" min="1" />
+    <button id="load">Load</button>
+  </p>
+
+  <video id="video" controls autoplay muted playsinline></video>
+  <pre id="status">Loading…</pre>
+
+  <script>
+    // The streaming-service API, reachable from the host browser.
+    const API = 'http://localhost:8082';
+
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+
+    async function load() {
+      const id = document.getElementById('stream-id').value || '1';
+      status.textContent = 'Fetching metadata for stream ' + id + '…';
+
+      let stream;
+      try {
+        const res = await fetch(`${API}/api/v1/streams/${id}`);
+        stream = await res.json();
+        status.textContent = JSON.stringify(stream, null, 2);
+      } catch (err) {
+        status.textContent = 'Failed to reach streaming-service: ' + err;
+        return;
+      }
+
+      if (!stream.origin_url) {
+        status.textContent += '\n\nNo origin_url — stream is not live (start it first).';
+        return;
+      }
+
+      const url = stream.origin_url;
+      if (window.Hls && Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.ERROR, (_, data) => {
+          if (data.fatal) status.textContent += '\n\nHLS error: ' + data.type;
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari can play HLS natively.
+        video.src = url;
+      } else {
+        status.textContent += '\n\nHLS not supported in this browser.';
+      }
+    }
+
+    document.getElementById('load').addEventListener('click', load);
+    load();
+  </script>
+</body>
+</html>

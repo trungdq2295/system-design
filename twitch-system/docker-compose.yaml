@@ -1,0 +1,85 @@
+services:
+  # 1. Encode server (origin): Go RTMP ingest + FFmpeg transcode -> HLS files.
+  encoding-service:
+    build: ./encoding-service
+    container_name: encoding-service
+    ports:
+      - "1935:1935"   # RTMP ingest — OBS pushes here
+      - "8080:8080"   # HTTP HLS — origin (direct test)
+    environment:
+      RTMP_PORT: "1935"
+      HTTP_PORT: "8080"
+      HLS_DIR: /data/hls
+      LOG_LEVEL: info
+    volumes:
+      - hls_data:/data/hls
+    restart: unless-stopped
+
+  # 2. CDN edge: caches HLS from the origin, serves viewers.
+  cdn:
+    image: nginx:alpine
+    container_name: cdn
+    ports:
+      - "8081:80"     # viewer playback
+    volumes:
+      - ./cdn/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - encoding-service
+    restart: unless-stopped
+
+  # 3. Database for streaming-service metadata.
+  postgres:
+    image: postgres:16-alpine
+    container_name: streaming-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: streaming
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # 4. Streaming service: Go REST API (stream metadata).
+  streaming-service:
+    build: ./streaming-service
+    container_name: streaming-service
+    environment:
+      APP_NAME: streaming-service
+      APP_VERSION: 0.1.0
+      ENVIRONMENT: local
+      LOG_LEVEL: debug
+      HTTP_PORT: "8082"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: streaming
+      POSTGRES_SSLMODE: disable
+      CDN_BASE_URL: http://localhost:8081
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # 5. Viewer: static hls.js page.
+  viewer:
+    image: nginx:alpine
+    container_name: viewer
+    ports:
+      - "8083:80"
+    volumes:
+      - ./viewer/index.html:/usr/share/nginx/html/index.html:ro
+    restart: unless-stopped
+
+volumes:
+  hls_data:
+  pg_data:
