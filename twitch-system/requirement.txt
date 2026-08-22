@@ -1,0 +1,85 @@
+Design Twitch
+Functional Requirement
+1/ Streamers can send their footage to many clients around the world
+   + High quality video
+        Typically, we use UDP for video streaming for
+2/ Viewers can adaptively change stream quality as their network requires without dropping frames
+    - Should client poll the streamer PC directly for video footage? Probably not
+        -> There can be lots of viewers
+        -> We want to minimize load on the streamer's setup to keep stream quality high
+        -> We can introduce a server that the streamers publishes to
+    - Should the streamers publish ultiple resolution of their own stream? NOPE
+        -> Unlike zoom, server only gets one footage source per streamm
+        -> We want to keep load as low as possible on the streamer PC.
+        -> Let's go with encoding server side
+3/ We can records streams and play them back later
+4/ Stream chat
+
+Non-Function Requirement
+1/ Low latency
+  + Data chunking
+       - It may be greatly beneficial to us to have our streamer send their video data in chunk
+       - We dont want to make our chunk too small
+        -> Fewer messages to send than per frame
+        -> Fewer message for client to recieve
+        -> Fewer video data metadata rows to persist
+            -> for watching back stream later
+            -> for aligning timestamps of chunks of different resolutions for slow client
+       - We don't want  to make chunks too big
+        -> Chunks that fail to send have to be re-sent, can be expensive
+   + Replication/ Partitioning of Stream Server
+        - How should we partition our stream server?
+           -> Using something like IP-based would be bad if streamer switches devices/networks (usually happyen on phone streaming)
+        - Let's do consistent hashing on stream ID
+2/ Fault tolerancce
+    - we have two option
+        + On stream server failure, use consistent hashing to evenly distribute streamers to other stream servers
+            -> Could overload existing stream server
+        + On node failure, redirect all of its traffic to a passive backup
+
+Open discussion
+1/ Problem
+    - Streams with lots of users
+    - Streams with viewers all over the globe
+    - How to resolve?
+        + CDNs for video chunks and caches for chunk metadata
+2/ Push vs Pull caching
+    It would be great if our server could push right to caches in order to avoid any intial caches
+    - Do we always know when streams will be popular in advance?
+      -> we verify the user if user has million subscriber
+          -> pushable cache
+           Tradeoff:
+            + More storage
+            +
+    - Unpopular user via hosting/ a stream raid
+      -> In this case we dont know in advance if they will get lots of viewer
+      -> will likely have to use a pull based cache
+3/ Thundering Herd
+- A situation where an unpopular stream suddenly gets lots of viewers
+    -> this can avoided by using a lock
+    -> Cache should only allow one request through server at a time
+4/ Stream recording
+To be able to ensure that we have access to stream later, we need to offload the data from the server
+We want:
+    - Fast ingestion of metadata
+    - Fast reads of memtadata
+    - Lots of storage for video chunks (S3)
+HBase for metadat
+    -> LSM tree for fast writes
+    -> Column based for fast read
+    -> partition by stream_id, sort by timestreamp
+
+
+5/ Stream chat
+Clients just have one chat they care about at a time
+Easy solution:
+    -> Everyone connect to a chat server based on stream Id (use consistent hashing)
+    -> Use websockets to send messages in real time
+However, if we have too many viewers for a given stream, this breaks down
+    -> Too many websocket connections for the single server
+    -> too many messages to deliver to each client
+How this can be resolved?
+    - Typically using client polling approached, basically lazy-loading everything
+    - All messages sent to a database and every few seconds each client pull in the last 10 messages
+    -> We need a database with really fast ingestion speed
+

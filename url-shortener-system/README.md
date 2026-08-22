@@ -18,7 +18,7 @@ A system aims to help user to shorten the link so it will easier to send
 * Maven
 
 ## System Design
-![System Design](https://github.com/trungdq2295/system-design/blob/main/url-shortener-system/system.png)
+![System Design](system.png)
 
 ## API Endpoint
 For now, I will focus on these endpoint only
