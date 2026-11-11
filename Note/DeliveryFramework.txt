@@ -1,0 +1,55 @@
+Delivery Framework
+  a framework to gives you a plan for how to use the time in system design, making sure you get the working system while leaving enough room to demonstrate our technical depth
+  Typical
+    Clarify Requirement: 5 minutes
+    Core Entities: ~2min
+    Data flow (Optional)
+    High-Level Design: 10~15 min
+    Deep Dives: ~10min
+  Remember this round is about communication. Thinking out loud
+  Clarify Requirement
+    Functional Requirement
+      On this step you should keep this list as short as possible
+      Typically: 3 requirement should be good enough
+      And then mention other function is out of scope and ask interviewer is ok with that.
+
+    Non-function requirement
+      Thinking if the system should be highly available or the system should scale
+      Make each requirement specific to the system that we're designing and where we can, put number in it
+      For example:
+          Dont mention low latency but to give number like low latency: <100ms.
+      Make it clear the requirement thing such as Availability > consistency ? or consistency > availability. Since this is to follow CAP theorem
+      Typically, all system will contains these checklist:
+        Consistency vs Availability
+        Environment constraints
+        Scalability, read/write ratio
+        Latency
+        Fault Tolerance
+        Compliance
+        Our job is to pull out 3 to 5 that are uniquely interesting for this particular problem
+          For example: In twitter case
+            it's read-heavy system and more people read tweets than they do write them
+            A feed can appear a few seconds late is fine
+        Back of envelop
+          This step we gonna calculate the traffic such as request per second based on the daily active user given by interviewer
+          However, this step should be included if it's really worth to do
+          So remember, you can talk to interviewer that you can do the math later when needed
+          For example: later on, when you want to cache, you need to calculate the size that you gonna cache to see if it's worth to cache or have better way to cache given your key
+  Core Entities
+    It's the entities in your system and Persona is one of them
+    If you're not clear, just look back at your function requirement to see what kind of entities will exist in your system design
+    Try to make it simple as first and tell your interviewer it's just a first draft and we might end up coming back to it
+    Recommendation: Do not mention the column/field yet. Leave it until the high level design so you will know which columns/field you need and you can go back later.
+  API
+    Most of the time, it is REST API
+    And usually, 1 endpoint for 1 functional requirement
+  Data flow
+    This step is an optional way. However, if we design a system where it's an background thing and no customer facing.
+    It is worth to have a short diagram about the data flow
+
+
+
+
+
+
+
