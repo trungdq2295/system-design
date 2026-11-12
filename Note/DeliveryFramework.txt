@@ -46,10 +46,25 @@ Delivery Framework
   Data flow
     This step is an optional way. However, if we design a system where it's an background thing and no customer facing.
     It is worth to have a short diagram about the data flow
+  High level design
+    The goal is to just get the simplest design down that satisfies your functional requirement first
+    Tell your interviewer upfront that you gonna get something done E2E first and then address its limitation via mydeep dive later
+      The easy way to do this is to endpoint by endpoint
+      When you reach the database container, you can start to mention the field of data model that your design depends on
+    As you go, you gonna see the problem with your design and that's a good thing. Just point them out and make a quick note and then keep going so you dont get stuck yet until you have that working high-level design
+  Dive-deep
+    In this step we gonna go back to our non-functional requirement and going 1 by 1 through each of them
+      What needs to be faster?
+      WHat need to scale?
+    Senior level should be able to find those weak spots themselves and proactively drive the conversation
+    Leading never means talking non-stop. You should give room for the interviewer to talk
+    Remember the interview is about communication between 2 people and your teammate is trying ask help from you
+    For example: "I'm gonna move on from this. Is there anything you want me to focus instead?"
 
 
-
-
-
+  Q&A
+    Q:What if the interviewer want to deep-dive questions before the high level design is done?
+    A: This is fine. Likely they've seen enough of the basics and they want to get a specific signal
+        Answer their specific question or if there's a gap, you can mention them out loud that you can come back later to answer them
 
 
