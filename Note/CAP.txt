@@ -4,3 +4,77 @@ CAP
     Availability - every requests gets a response (successful or not)
     Partition tolerance - system works despite network failures between nodes
   Why does this matter?
+    Important to define the system characteristics early during non-functional requirement
+    They influence your design decision during deep dives
+  Why is partition tolerance a must?
+    Because network is never reliable in distributed system
+    CA only happen in a node and in distributed system, we have many node which always have to deal with network
+    For example:
+      We have a use-case where our service get deployed on US and EU region
+        User A write to USA server and it get replicated to Europe server for User B to read
+        What happens if the replicate is failed due to network when user A write data?
+        So in this case:
+          a) should we give user B an error due to the data is stale and we dont want them read it (consistency)
+          or b) we just let them read the stale data ? (availability)
+  Examples where we need strong consistency
+    Ticket booking service (airline, event, etc...)
+      - If we sell a ticket, everyone needs to see it as unavailable, without delay
+    Inventory system (Amazon)
+      - Cant sell the same last item to multiple customer
+    Financial systems
+      - Stock trades must be executed in strict order
+  If you dont need strong consistency, then always choose availability !!!
+    Social media app
+      Where user can still see the stale posting
+    Yelp like business review service, google map ratings
+      People can see the not up-to-date review
+    Streaming service like Netflix
+  Whe you are going over your non-functional requirement, you are asking yourself simple question:
+    Does this system require strong consistency?
+    Does it matter for single user  see the same state of my system at any given time?
+      If the answer is yes, then you have to go for strong consistency
+      IF teh answer is no, always goes for availability
+  How does it influence my design?
+    Strong consistency
+      Implement a distributed transaction
+        For example: 2PC approach,
+      Limit to a single node
+        You can use a database such as PostgreSQL which support atomic transaction where it can ensure people can read and write to the same data since it's the same database
+      Discuss consensus protocols
+      Accept higher latency
+        For example like the propagation write to other instance where user have to wait for that
+      Example tools
+        PostgreSQL
+        Traditional RDBMS
+        Spanner
+        NoSQl with strong consistency mode such as DynamoDB
+      So the question is: How can other node know the data is stale so it can reject when it receive the read?
+        The answer is simple: Before returning data, the system must guarantee that the data is valid according to its consistency model.
+        This can be implemented by many way
+          Consensus protocol
+            Like the node will call to the leader to verify if the data is stale before returning to client
+          Quorum protocol
+    Availability
+      Use multiple replicas
+      CDC and eventual consistency is ok
+
+
+  ADVANCED!!!
+    Different parts of a system can have different requirements?
+      Ticket master
+        availability for CRUD on events
+        consistency for booking tickets
+      Tinder
+        availability for viewing profile data
+        consistency for matching
+
+  Different types of consistency
+    Strong consistency: all reads reflect most recent write
+    Casual consistency: related events appear in order
+      Example: This is like you reply an comment and someone also replied earlier but before you. then later, their comment should be ordered before you
+    Read-your-writes Consistency: user see their own updates
+    Eventual Consistency: update will propagate eventually
+
+
+
+
