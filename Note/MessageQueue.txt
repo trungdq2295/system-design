@@ -1,0 +1,40 @@
+Message Queue
+  Just a buffer queue between producer and consumer
+  It is to decouple system, the producer doesnt need to know about consumer
+  Every queue system just needs a way to make sure that a message is only being actively processed by 1 consumer at a time
+  There's 3 type of delivery guarantee
+    At-least-once: Message may be delivered more than once (The most common)
+      This is always an answer for message queue usecase. You always make consumer idempotent
+    At-most-once: Fire and forget; message may never arrive
+      You really only want to use them for analytic event or metric where a few data lost is acceptable
+      You have to accept the message lost but it's fast
+    Exactly-once: every message processed exactly one time
+      This is really not possible.
+      Never promise this delivery guarantee unless you're confident to defend it
+  When to use a queue
+    Async work
+      User doesn't need result now. (Sending email, generating report, upload)
+    Bust traffic
+      Absorb spikes without dropping requests
+    Decoupling
+      Service scale & fail independently
+        In this scenario, even producer/consumer service is crashed/down, the other still work normally. however, everything will depend on message queue
+    Reliability
+      Can't affort to lose work. Queue holds message until it acked
+  Common Deep dives in interview
+    How will you handle increased throughput?
+      Increase partition
+      Batch processing
+      Parallel processing
+      Consumer group
+        We usually split consumer group based on the business logic where it's independence
+      Ordering key
+        This is very important since choosing the wrong shard key can lead to hot partition.
+        Choosing ordering key here is one of those decisions that's worth really spending
+    How you gonna handle the case where producer speed is faster than the speed of consumer
+      The case is about consumer is never be able to catchup the speed of producer
+      Typically, we usually increase partition or increase consumer to increase throughput like the 1st question
+      But another approach is backpressure which is to tell producer to slow down
+      BE ready to discuss this question because interview want you to understand that a Queue isn't just magic
+    What if the message queue is down/crashed?
+      This question is about durability
