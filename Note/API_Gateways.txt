@@ -1,0 +1,10 @@
+API Gateways
+  In the past, we typically use monolith for our backend service so it's still good
+  Until the microservices was invented, the client has to manually handle routing since backend have many services now
+  So the API gateway is created to handle the problem routing
+  After that, each services still have to handle the logic AuthN/AuthZ, rate limit which isn't really good choice since the logic can be duplicated across many service.
+  So we bring the term "middleware" into API gateway too
+  Typically, the reality is that with a microservices architecture, an API gateway always existed to encapsulate the logic of middleware.
+  So in the system design interview, just put API gateway, mention that it handles routing, maybe some middleware logic such as AuthN/authZ and keep moving.
+    Dont spend too much time in this layer. It's just not the important part of your design.
+    It's good to understand but it shouldn't be the focus
