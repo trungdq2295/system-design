@@ -1,0 +1,68 @@
+Distributed Transaction
+  Tradition Transaction
+    ACID
+      Atomic: Either all of them happen together, or none of them do
+      Isolation: If the transaction is in process, no other part of your system can see the half-finished state
+  There's like 2 type of way to handle distributed transaction
+    2 Phase Commit
+      A class academic solution to give you strong consistency
+      The idea is to introduce a new componented called a coordinator whose entire job is to make sure that all participant in a transaction agree on the outcome before make their changes permanent
+      It work in 2 phase
+        Phase 1: Prepare phase
+          The coordinator sends a message to every participant, asking "Can you commit this transaction?"
+            Each participant does the actual work. It process the request, durably records the changes so that nothing is lost if it crashes and locks the affected rows so that no other transaction can modify them in the mean times
+            Then it reports to coordinator that "yes, I'm ready to commit" or "no, something went wrong"
+            If any participant says no, then the coordinator tell everyone to abort transactino and release their locks
+            In all participant say yes, then the coordinator move to phase 2
+        Phase 2: Commit
+          Coordinator sends commit message to every participant.
+          Each participant make the changes permanent and release those locks and the transaction is now complete
+      However, 2 PC doesnt work at scale (high traffic).
+      2PC is a blocking protocol and blocking in distributed system is dangerous because you're now dependent on multiple machine all staying healthy at the same time
+      For example:
+        1/ Crashing
+          The coordinator send a prepare message to all participant and then coordinator crashes. Now all the participant is blocked because they have no idea what to do next. They don't know if they should commit or abort the transaction. They can't abort because other participant might commit it. And the other transaction waiting for the blocked row to be release, get blocked too
+        2/ Latency
+          A single participant is slow to respond to coordinator can lead to the process getting slow. It's just like the concurrency external call and all the thread have to wait a single thread to be done to be moving on
+      That's why people don't really use 2PC in production
+      However, it does existed in database layer such as Spanner. In this way, the database handles the complexity internally so our application layer doesnt really need to care about it
+      That's where Saga pattern comes it
+    Saga Pattern
+      Saga starts from a very different assumption than 2PC
+      You don't actually need all or nothing atomicity but you need a way to eventual consistency will be good enough
+      So, instead, you run what is called a compensating action. You do a thing like business level undos that reverse the effects of what already happens
+        For example: a refund of a charging money, a cancel order when order is placed
+      Something needs to detect that failure and trigger those compensations
+      So the tradeoff of this saga pattern is it's not strong consistency but eventual consistency
+      2 way to implement sagas and the choice between them determines who's responsible for detecting failures and running compensation
+        Choreography
+          It's the decentralized option
+          It uses a pub/sub pattern where each service broadcast an event when it finishes it work and any interested service can pick it up and react. Even it's a failure or success message
+          This works fine if you have simple flow like only 2 or 3 services
+          But once you get to 5 or 6 services all publishing and reacting to each other events, figuring out the current state of any give transaction becomes really difficult
+            Example: Where exactly did it fail?
+              Where is the current state of transaction?
+              How to rollback effective?
+        Orchestration
+          It's an centralize option where you have an orchestrator to do the work
+          Instead of services reacting to each other, you have a dedicated orchestrator service that controls the entire flow
+            It tells each service what to do, 1 step at a time
+          It's what most teams end-up using once they reach any serious scale (high traffic)
+      The big tradeoff of this system is
+        Not all compensation is easy to reverse
+          For example: an external call to third party, you can't be sure if your reverse request send to them happen or not at all
+          What if your reverse operation is failed? You add retry and whenever you have retry, you need idempotent logic
+      When should we choose SAGA?
+        Each step in your saga needs a well-defined compensating action
+  Decision Framework
+    Always Avoid to use distributed transaction as much as possible
+    Choreography is usually where team start, and for simple flow, it works great.
+      If you have 3 or 4 steps, the services are truly independent and you don't need centralized visibility into where each transaction stands
+      Choreography keep thing simple
+      Try not to over-engineer from day one
+    Orchestration is for complex flow. Complex flow with branching logic, flows where you need to see exactly where a transaction is stuck, flow where logic is tricky and you want it defined in 1 clear place rather than scattered across half a dozen services
+    If eventual consistency isnt acceptable for a particular piece of your system, consider using single distributed database like spanner that handle that strong consistency internally for you.
+    In many companies such as Uber, Netflix, Amazon, the pattern people always use at scale is Saga with orchestration + Idempotent operations at every step so the retries are awlays safe, and a transaction outbox to make sure event are as reliable as database writes. It mean accepting eventual consistency but that's a tradeoff that industry made deliberately.
+
+
+
