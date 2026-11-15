@@ -1,0 +1,109 @@
+RabbitMQ
+  Traditional message broker
+  It follow mental model of queue-like data structure
+  RabbitMQ broker handles a lot
+    Routing
+      It has routing rules so it know which queues the message belong to
+    Delivery Tracking
+      Track which message have been delivered
+    Retries
+      Retry any failed delivery message
+    Dead letter queue
+      When a message fail repeatedly, rabbitmq move it to dead letter queue automatically
+  RabbitMQ maps really well to task-oriented workloads
+    It is like you have a list of task and waiting for a worker to pick it up and does it
+    Like sending email, processing payment, resize image
+Kafka
+  It's like an distributed appending only log
+  It has retention log
+Comparison
+  Kafka
+    Simple broker
+    Smart consumer
+    In short: messages live in kafka
+  RabbitMQ
+    Smart broker
+    Simple consumer
+    In short: message flow through rabbitmq
+  Usecase
+    Kafka: mostly use for event stream
+    RabbitMQ: mostly use for task based
+
+Technical Differences
+  Ordering Guarantees
+    RabbitMQ
+      If you have 1 consumer then the order is strictly guarantees
+      If yu have multiple consumer, it will be parallel execution
+      The idea is you have to tradeoff between throughput and ordering gurantees
+      IN short: RabbitMQ give you global ordering with a single consumer
+    Kafka
+      In a same partition, and you can set partition key to make it go into the same partition
+      In short: Kafka give you per key order with parallelism
+  Throughput and latency
+    RabbitMQ
+      Throughput: 4000 to 1000 message per seconds
+      Latency: 1 to 5 ms for low-volume workloads
+      This is due to rabbitmq use push-based model
+      The broker does a lot of work which include message routing, message acknowledgements, tracking delivery state
+      -> As the message increase, the throughput decreased
+    Kafka
+      Throughput: 1Million message per second
+      LAtency: 5-50 ms
+      The kafka follow pull-based model where consumer will periodically pull the message from broker
+      The broker only handle appending log -> As message increase, the latency stay the same
+  Delivery Guarantees
+    Both rabbitmq and kafka support at-least-once
+    Kafka also supports exactly once but this is not thing to do and the usecase it supports is complicated
+      The requirement to achieve this is: Kafka-to-kafka only, same cluster, using kafka transaction
+      So if your message require database, external call then this option still doesnt work. you still need idempotent
+  Infrastructure Operation Consideration
+    RabbitMQ
+      Simple to setup.
+        Single docker
+        Simple clustering
+        A management UI
+    Kafka
+      Way too complicated
+        Zookeeper/Kraft
+          Zookeeper is used as Separate coordination service.
+          Newer version dont use zookeeper but to use KRaft instead
+        Partition Management
+        More moving parts
+          Topic configuration
+          Rebalancing
+          Consumer group setup
+          ...
+      So if you use kafka, consider to use managed service like Confluence Cloud, Amazon MSK,... unless you have dedicated infrastructure team for kafka (just like K8S lol)
+
+When to use each
+  RabbitMQ
+    Task queues and background jobs
+    Smart routing
+      The broker decides which worker gets which message based on content
+    Low latency at moderate scale (low traffic)
+    Simpler operation
+      Easy to set up and maintain
+    Example usecase:
+      Instagram
+        Photo upload
+      Reddit
+        Building comment threads
+        Calculating karma scores
+  Kafka
+    Multiple readers from one stream
+    Replay capability
+    Massive Scale (millions event per seconds)
+    Durable event history
+    Example usecase:
+      Netflix
+        Recommendations
+        Billing
+      Uber
+        Real-time pricing
+        Fraud detection
+      Linkedin (kafka inventor)
+        Feed & Messaging
+
+
+
+
