@@ -1,4 +1,91 @@
 System Design
+Understanding what's expected
+  What framework should you follow the present your design
+    1/ Requirement
+      Primary Goal:
+        Functional requirement
+        Non-functional requirement
+    2/ Core entities
+      Such as persona and the entity in your system
+    3/ API or interface
+    4/ Data flow (optional)
+    5/ High-level design
+    6/ Deep dives
+  How are system design interview evaluated?
+    1/ Problem solving
+      Identify & priority the core challenges. The upfront thinking to solve the problem
+      For example: If you design an ticket system, you should focus on the ticket flow not the authentication flow
+    2/ The solution design:
+      Create scalable architectures with balanced trade-offs
+        Did you weigh trade-offs
+        Did you arrive at something that meets those functional requirement
+    3/ Technical expertise
+      Demonstrate deep knowledge and expertise. Deep dives that you have technical expertise in some, not all, area of system.
+        Specific areas where thing could break
+    4/ Communication
+      Clearly explain complex concepts to stakeholders
+
+
+The Fundamentals
+  The foundation knowledge you need to have to cover the system design. It typically contains 6 things:
+    1/ Storage
+      You should be able to discuss data model approriate usecase
+      Be prepare to explain things like how data is organized in relational DB, document based, key vaule
+      Understand ACID and BaSE concept
+    2/ Scalability
+      It the concept of how we do our scale system to support more user, more requests
+      Scale compute: Vertical scaling and Horizontal Scaling
+      Scale storage: Partitioning, Sharding, Consistent Hashing,...
+    3/ Networking
+      Typically OSI model. and we usually focus on 3 layer
+        Network Layer - Layer 3
+          Load balancing
+          Firewall, ACLs
+        Transport Layer - Layer 4
+          TCP
+          UDP
+          Request/Response Lifecycle
+        Application Layer - Layer 7
+          HTTP/HTTPS protocols
+          REST vs GraphQL vs gRPC
+          Restful Semantics
+          DNS resolution
+          Websockets vs SSE
+    4/ Latency, Throughput and Performance
+      A task where you need to optimize performance
+      You should be able to recall approximate latency, or demonstrate your ability to understand soem throughput limitations and maybe some basic capacity estimation
+      Be prepared to identify performance bottleneck
+    5/ Fault Tolerance & Redundancy
+      Failure modes
+      Failure Detection & Recovery
+      Typically in this step you need to be aware what happen if a failure happens and what you gonna do to recover
+    6/ CAP Theorem
+      We typically talk about this during the non-functional requirement
+      So this theorem typically like If a network fails between nodes in distributed system, we only have 2 options
+        - Stop serving data (consistency)
+        - or risk wrong data (availability)
+Components
+  Databases
+    Don't get caught up in the old SQL vs NoSQL debate. Most modern database can scale well and can maintain data integrity
+    So the real question isnt SQL vs NoSQL. It is how does your app need to read and write data?
+      So typically, SQL is for schema-on-write and NoSQL is for schema-on-read
+  Cache
+    It is to stored your data in memory
+    The problem is how do you invalidate your cache system?
+  Message Queue
+    The main challenge is to make sure the message is actually get delivered.
+  Load balancer
+    Load balance your request
+  Blob Storage
+    Your database is designed for organized structure data like user account or product information. It is not designed thing like images or videos
+    Keep your unstructure data in your blob storage
+Problem
+  Work backward from commons problem and topic
+    Bitly -> Dropbox -> Ticketmaster -> Newfeeds -> Whatsapp -> Leetcode -> Uber -> Web Crawler -> Ad click aggregator -> Postsearch
+  Above topics is typically cover the most thing and another use case is just extended from this
+
+
+
   Requirement
     Always ask for functional requirement to minimal the scope we need to do
       Like the use case
