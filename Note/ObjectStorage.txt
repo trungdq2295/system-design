@@ -1,0 +1,38 @@
+Object Storage
+  A type of database that stores file or Binary Large Object (Blob)
+    Video, text, Photo
+  Why dont we store this blob in normal database?
+    Because the normal database or relational database is built for small frequently chnaging records that need rich queries and thing like joins
+    For example: in PostgreSQL, by default pack all these data internally into 8kilobyte pages. and so if you were going to store a 4MB jpg file, then you will need 500 page in postgresql. Why is it so bad?
+        A simple query: select * from user limit 50
+        Even when you only want a small access and having these large images stored alongside all of the user data is going to create a ton of extra overhead.
+        The database has to manage and potentially access these huge files, these many megabytes of pages that we have now
+        This is going to impact thing like performance, increase memory pressure, slow down what should be fast and simple queires
+        Furthermore, the replication is also an issue when you replicate to multiple data and those large file will create a ton of lag and consume massive bandwidth
+    In short, the reasons are:
+      Big file bloat pages, slow every query
+      Replicas and backup copy blobs, huge lag and downtime
+      DB storage cost 10x more than object store
+How does object storage work?
+  So when client request an object, typically we have an metadata service which stores the metadata of object such as which server the object is stored, the size, the file type, ... and then server who hold the file will stream back to the client
+  So what make this so cheap and durable in the first place?
+    Flat namespace: quick file lookup
+    Immutable write: no locks or races
+    Redundancy: 11 nine of durability
+
+
+What should you know for an interview
+  1/ Large files stored in Object storage, metadata in "traditional" database
+  Example:
+    - Photos / videos for a social media or messaging apps
+  2/ You can upload/download directly to your object store via presigned urls
+    The idea is when client request a upload/download a file from server, server will generate an pre-signed url which is like an authentication/authorization layer for client to get what they need only (least priviledge)
+    Why we dont just let client upload/download directly to server? this will cost an extra bandwidth which introduce more thing to handle such as failure, network, scaling
+  3/ Large files are uploaded in chunks and object storage will "stich" the file back together (multi-part upload)
+    The limitation of this approach is some object storage service limit the size of chunk (For example: S3 limit 5MB per chunk)
+      This leads to if we upload 1GB file, then we need to split into 200 chunks (either parallel or sequence)
+
+Example popular Object (Blob) stores
+  S3
+  Google Cloud Storage
+  Azure Blob Storage
