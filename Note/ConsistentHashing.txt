@@ -1,0 +1,32 @@
+Consistent Hashing
+  The problem with large volume storage
+    Typically, when we have more data to store, we usually increase more database to store it (liek sharding), and then we gonna use a way to detect which database the data belong to. So we usually use modulo to get the shard
+    This work fine until you add/remove a shard which cause rebalance where it re-distribute all data to each shard
+    This leads to a consistent hashing introduced
+  Consistent hashing consists 3 steps:
+    1/ We created hashed ring with fixed number of point. and then we split eventually the area based on database
+          For example, if we have 4 database -> we split the ring into 4 equal area in the ring
+            -> DB1 at number 0
+                DB2 at number 25
+                DB3 at number 50
+                and DB4 at number 75
+       So now, in order to know which database a particular event (data) should be stored on, we get the hashed value of the event, and then move clockwise, until it reach a certain database
+          For example: we got a event 2 and hashed value is 16. then it move from point 16 clock wise until it reach 25 which is DB2. then event 2 will be stored in DB2
+       Remember, the hashed ring isn't physical but it's mathematical construct programmed in our code
+  So how consistent hashing help us?
+    Supposed we want to add new database, we're not updating the current area but we will place it at specific point.
+      For example: we add database 5 at point 90. Then the re-distributed data from point 75 to 90 will be loaded into Database 5 and then 90 to 0 data still at database 1. We dont need to re-distributed the whole data
+    The same with an database to be removed.
+      For example: if we remove database 2 at point 25, then all the data between point 0-25, will be moved to database 03 without the needed to re-distributed all of data
+      However, in this case, this will introduce the database 03 stores a lot of more data, compare to database 4 and database 1. so how can we resolve this?
+      So in this case, we introduced virtual node where we instead of putting database at a single point, we spread it eventually like
+          database 1 at point 0, 20, 40,..
+          database 2 at point 5, 25, 45,...
+          database 3 at point 10, 30, 50, ..
+          database 4 at point 15, 35, 55, ..
+  Real world usecase uses consistent hashing
+    Redis
+    Cassandra
+    DynamoDB
+    Many CDNs
+
