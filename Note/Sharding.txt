@@ -9,7 +9,8 @@ Sharding
         The good shard key has 3 properties
           High cardinality: The field has many unique value. The more data, the easier we can find
           Even distribution: The data in each shard is equally
-          Align with queries: We shard on the column we used the most in the query
+          Align with queries: We shard on the column we used the most in the query which mean we only need to to query 1 database to get
+            For example: You need to get a list of post created by userID then postID isn't a good shard but userID is
     How to distribute data
       It's a mapping a shard key values to a given machine to a given database
       Range based
@@ -50,3 +51,19 @@ Sharding
         2 Phase Commit
         Try to avoid cross transaction as much as possible
         Saga Pattern
+
+Sharing in your system design interviews
+  Bring it up in deep dives when talking about scaling. But justify !!!!!
+    1/ Storage
+      You need to make sure the current capacity of database not be able to handle the storage before deciding to sharding
+      For example: storing 1TB data in a single Database is fine but 5GB is when you should add sharding
+    2/ Write throughput
+    3/ read throughput
+  YOU DONT ALWAYS NEED TO SHARD !!!!
+    What should you say? Simply follow 4 step
+      1/ Propose a shard key based on your read/access pattern
+      2/ Choose your distribution strategy: range-based, hash-based, dictionary-based
+      3/ Call out the trade-off
+      4/ Address how you will handle the growth
+        For example: how you will handle when we add more shard?
+
