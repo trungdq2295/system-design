@@ -1,0 +1,43 @@
+Database Indexing
+  How to find a row in database without an index?
+    1/ Pull a page into memory and search for the row
+    2/ Pull another page into memory and search for the row
+    3/ Repeat until the row is found
+  Index is just a simply a data structure that are stored on disk and act as a map to tell us where items or which page items exist in the database
+    So when a new query comes in for particular item, we first pull that index into memory to check which page that index tell us the resource or the item lives on and we pull only that particular page
+
+Type of indexing
+  B-tree
+    A data structure and algorithms where ach node in the tree is a sorted list of values with pointer to another page in disk
+  Hash-index
+    It's just an hashmap where you hash your data to get a hash key and then retrieve the value which is reference to the page value
+    While this hash-index offer O(1) lookup, B-tree performs nearly just as well as this and B-tree also support range query and sorting so B-tree is prefered in many data database. while hash-index is used in memory cache just like Redis
+  Geospatial indexes
+    Support geospatial data where you need to search a location based on latitude and longitude
+    B-tree works really well in 1 dimension but not good in 2 dimension data like geospatial indexes
+    3 most popular geospatial indexes
+      Geo-hashing
+      Quadtrees
+      R-trees
+    Geo-hashing
+      Typically you take a map a world and then split into 4 equal area and then we do that recursively on each area
+      Geo-hash is really use base32
+      Many database use this
+    Quad-tree
+      This approach we still split the world recursively and put them in a tree.
+      We split them
+      Foundation of geospatial index but not used much
+  Inverted Index
+    It is good when you search for text
+    Typically, this index will use a map key/value the key is character and value is the data which contains that word
+Wrap-up
+  Not always we need an index because everything come with trade-off
+  Do we need efficient data access?
+    If no -> full table scan
+  If yes, does table size have more than 80k rows?
+    If no -> full table scan
+  If yes, what type of data are we querying?
+    Full-text search -> inverted index
+    Location data -> geospatial index
+    In-memory exact match -> hash index
+    everything else -> B-tree
