@@ -1,0 +1,60 @@
+Real-time Collaboration
+  It's about the function where people can real-time collborate on a same thing such as google doc, figma, excalidraw live
+  It usually have these problems:
+    Conflict Resolution
+      Where multiple people edit a thing at same time
+      How to resolve this?
+        Attempt 1: Just write to a shared store
+          Have every client  write their version of document to the blob store
+          -> The last write win
+          This can lead to losing the write which come first
+          -> Not really a good way to do
+        Attempt 2: Send edits instead of snapshots
+          Instead sending a whole file, we only send an edit thing like "I add the word "fox" at this position"
+          This will reduce the bandwidth where we only send the thing we update
+          However, this introduce a new problem.
+            For example: Today is good day
+              User A edit "is" into "are" and user B edit "day" into "weeks"
+            So the position of word "day" is no longer the same since "is" become "Are" and the length changes
+  Operational Transformation
+    The idea is when you transform operations. When 2 edits happen concurrently, you mathematically adjust 1 operation so it accounts for the effect of the other
+    So the server acts as source of truth and every client sends their operation to server and the server decided the canonical order
+    However, it comes with the bad size. When you have simple operation such as delete, insert then you can simply create few pairs. When you have like many operation such bold, italic, update,... you will have hundreds of pairs to merge them together
+    Even a google engineer said this OT sucks. It contains many edge case
+    The Operation Transformation work in some cases but it's complex, scales poorly and practically it requires central server
+  Conflict-free replicated Data Type (CRDTS)
+    It simply design a data structure itself so that concurrent edits can never conflict. The merging logic is baked into data structure
+    So the implementation are: the CRDTS give each character in text an unique ID
+      For example: "Hello", the uniqueID will be "1.0", "2.0", "3.0", "4.0", 5.0
+        When user A insert a character "X" between 2. and 3.0, that character "X" will have an value which is 2.63
+        When user B insert a character "Y" between 2. and 3.0, that character "Y" will have an value which is 2.34
+        Since ID is unique and totally order, there's deterministic sort order. both user A and user B see the same sequence
+    So the pros is there's no central data and 2 user can edit concurrently
+    However, there's some issue
+      1/When you delete a character in CRDT, you can't actually remove it from the data. Other replica still reference to it.
+        So the delete replica become tombstone, invisible, but still taking up space
+        Over the time, heavily edited document accumulates a lot of dead weight.
+      2/ a bigger issue is that convergence, being that all users see the same document, doesnt mean correctness.
+        This is too abstract lol
+    Pros
+      No central server needed
+      Work offline/ any topology
+      Proven convergence
+    Cons
+      Tombstone overhead
+      Convergence # intent preservation
+      Harder to debug
+  Differential Synchronization
+    Each client keep 2 copies of the document, what they have now and what they had the last time they synced. Periodically, they diff those 2 copies to figure what changed, send that patch to the server and the server applies it. The server does the same thing in reverse. it diff current state against what it last sent to each client and sends patches back.
+    The process become Diff, path, repeat
+      No operations types to define, no transformation functions, no functional data structure
+      You just need a good diff algorithm and a good patch algorithm
+    Pros
+      Simple to implement
+      Works with any data format
+      No special data structures
+    Cons:
+      Lossy
+        Intermediate edits kind of disappear into the diff.
+      Needs a server
+      Less granular than OT/CRDT
