@@ -1,0 +1,99 @@
+Caching
+  A cache is just a temporary storage that keeps recently used data handy so you can get it much faster next time
+  Memory (RAM) is roughly 10,000x faster than disk (SSD) on average
+
+Where should you cache your data?
+  External caching
+    You introduce a dedicated caching service like redis, memcached
+  In-process caching
+    In this case, you cache inside your application server rather than reply on external service like redis/cache and you dont need to make a network call to get data
+    THe tradeoff is each application has it own in-process memory so the inconsistent can happen here
+  Content Deliver Network (CDN)
+    A geographically distributed network of server that can cache content closer to your users
+    This CDN doesnt optimize for the different between memory and disk speeds. It mainly focus on networking
+    CDN now can do a lot more than just caching for static content (image, video,..) like caching API response, html pages,...
+    However, in the interview, CDN is mainly used to cache for image, video and stuff. Try not to mention for other purpose
+  Client-side caching
+    A client cache themselves to prevent network call to Server
+      such as local storage in web/mobile app
+    Tradeoff: harder to control when data is stale, freshness
+    In the interview, this come up a lot less often. It only relevant when your system involve somes offline functionality or client-side heavy workload
+      For example: Browser cached an images it already downloaded
+                    Strava store your run data when you're offline and sync to server once you're connected to network
+Cache Architecture
+  It's to define your application actually interacts with the cache. so, specifically, this define the order in which read and writes happen between both your cache and your database and your application
+  1/ Cache-aside
+    Application check cache first
+      IF cache hit, you return the data
+      If cache miss, you query the database to fetch the data and store in the caches and return to the client
+    This approach is simple and lean and you only cache your data when you need it.
+      WE only cache the data user requested. If user dont request then data never be cached
+    The cons:
+      If a cache miss, it will add latency since request have to fetch data from DB and store in cache and return back
+  2/ Write-through
+     The application gonna write to the cache fisrt and then synchronously write to the database and return back to the client
+     The cons:
+      The write path is slower since we need to write on both cache and database
+      Some data can be polluted since the write happens on both cache and database and they might not be used
+      Dual-write problem
+     This approaches is rarely used since the cons is too painful and complexity
+     We only use this approach when reads must always return the fresh data and the write can be slower
+  3/ Write-behind
+    Same write-through approach but the write to database is asynchronously
+    This make the write much faster
+    The cons
+      If the cache is crashed/down before the sync to database happened, we lost the data
+    We only use this when high write throughput is more important than immediate consistency or close to immediate consistency and data loss is accepted
+      For example: analytics, metric
+  4/ Read-through
+    It similarly to cache-aside but the cache handle the step fetching data from database instead of application
+    For example: CDN (lol)
+Cache Eviction Policies
+  The tradeoff of storing on memory instead of disk is that Ram is expensive and limited
+    You can't fit your whole data set in the cache
+  There're few strategy that decide what to keep and what to remove as new data come in
+    Least Recently Used (LRU): Evict items that haven't been used recently. Most common and balanced default
+    Least Frequently used (LFU): Evict items that are used least often, even if accessed recently. Good for highly skewed access pattern
+    FIFO: Evict the oldest item first. Simple but rarely the right choice
+    TTL: each item expires after a set time. Great for data that can go stale, like API Responses
+Common Issues
+  Adding a cache introduces a lot of challenges and interviews love to ask about them
+  Cache Stampede (Thundering Herd)
+    It happens when a hot cache entry expires via TTL and suddenly, a flood of client request all try to fetch data at same time which cause all those request get to reach the database
+    How to prevent this?
+      Request Coalescing or single flight
+        The idea is when multiple request try to build a cache key, then only 1 of them work and the other should wait
+      Cache warming
+        Instead of waiting the cache key to expired, we have a background job to actively to refresh the cache key
+  Cache Consistency
+    It happens when cache and database return different value for the same data
+      This is the one interview really love to ask about
+    For example:
+      You upload the new image for your profile picture, however the current profile picture in the cache isnt updated yet which ended up inconsistency between cache and database
+    There's no perfect fix for this and it very much depends on how fresh your data needs to be and that's case by case basic
+    Typically:
+      - We use invalidate on write. however this still introduce failure when the invalidate failure
+      - Short ttl so it can get the fresh data
+  Hot key
+    A cache entry have way more traffic than anything else
+    How to solve this?
+      The common solution is to just replicate the hot keys
+      Local caching (in-memory caching)
+        We can keep the hot pod stay in the memory cache before the application reach the redis layer
+
+Caching in System design interview
+  When to bring up caching
+    Read-heavy workload
+    Expensive queries
+    High database CPU
+    Latency requirement
+  How to introduce caching
+    1/ Identify the bottleneck
+    2/ Decide what to cache
+      Be explicit about what you gonna cache like "I will cache the user information" rather than "I will add cache and it work"
+    3/ Choose your cache architecture
+    4/ Set an eviction policy
+    5/ Address the downside
+      The pros/cons with your approach
+  Caching usually comes up during the deep dives when we're discussing scale
+    So when we are talking about non-functional requirement and at topic scale, that's often time the most approriate time to bring up caching and trying to figure out to make it fit into our system
