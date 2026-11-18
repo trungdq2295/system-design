@@ -1,0 +1,48 @@
+Common Pattern In System Design
+  Scaling reads
+    This is for when reads outgrow how much database can take
+    Typical solution and their downside
+      - Adding index in database
+      - Denormalized data to avoid expensive joins
+      - Read Replica to serve read
+        Downside: replica lag
+      - Add cache layer
+        Downside:
+          Stale cache - needs an invalidation strategy
+          Hot key
+  Scaling writes
+    When the writes start to outgrow how much database can handle
+    Replica aren't going to help us
+    Typical solution
+      - Sharding
+      - Add a queue
+  Dealing with Contention
+    Concurrency problem when 2 concurrent thread/request to modify the same data
+    Solution
+      Conditional write
+      Row lock
+      Optimistic concurrency
+    Everything should be resolved inside database
+    It's getting harder if you try to resolve the contention live in different place
+    When you split your data across databases, you're trying to solve coordination problem which database was solving for you
+  Handling Large Blobs
+    In this problem, we dont typically let client download/upload the blob file to server and server load to blob storage
+      This will cost x2 bandwidth
+    we approach b y letting server to create an pre-signed url where it contains short-live permission for client to upload/download the blob directly to/from blob storage
+    The downside is server need to store the metadata of the blob and never know if the upload is success.
+    So we gonna a thing to check the status
+  Long-running Tasks
+    Some operation take too long to handle within single API request
+      For example: video encoding
+    Typically, in this problem we will use queue and let the client send the data and put into the queue
+    But be careful!! if the task only cost under 1second, just use sychronous lol
+  Realtime Updates
+    The client want an real time update
+  Multi-step Processes
+    an workflow contains multiple steps
+    In this problem, try to use the tool such as Temporal, AWS step function
+      They already implement logic such as retry, start on each step already for you
+  Proximity Search
+    This is to finding thing near our location so it contains longitude and latitude
+    We use geospatial index to help us to do this
+    Typically those opensource help us: PostgreSQL + postGIS, redis Geo command, Elasticsearch geo queries
