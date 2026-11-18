@@ -1,0 +1,76 @@
+API
+  REST API
+    Resource Modeling
+      resources are just your core entities
+      plural noun
+    For example
+      GET /events                 # Get all events
+      GET /events/{id}                 # Get a specific event
+      GET /venues/{id}                 # Get a specific venue
+      GET /events/{id}/tickets                 # Get avaialbe ticket for an event
+    HTTP Methods
+      GET - retrieve data
+      POST - create data
+      PUT - idempotent update/replace
+      PATCH - partial update
+      DELTE - remove data
+    Inputs
+      Path param
+        GET /events/{id}
+        - specific which resource you're working with
+        - use when required to identify the resource
+      Query params
+        GET /events?city=LA&date=2025-01-01
+        - optional filters
+      Request body
+    Response
+      1/ The status code
+      2/ Response body (usually a JSON)
+      Status codes
+        200 - success,
+        201 - success, created
+        400 - bad request
+        401 - not authenticated
+        404 - not found
+  GraphQL
+    Created by FB in 2012 and open sourced in 2015
+    This is still running over the HTTP method
+    The idea is instead of making a multiple http call, we use a single graphql call only
+    However, it come with few problem
+      N+1 query
+        For example
+        user {
+          id
+          name
+          posts {
+            title
+          }
+        }
+        GraphQL is a query language and execution engine so it doesnt automatically optimize thing but to follow the resolver structure
+          1/ Execute Query.user to retrieve list users
+          2/ For each users, resolve the requested field
+          3/ When it reach users.posts, call the resolver for each user
+          -> N+1 problem
+        The way to overcome it is to user DataLoader from graphql
+      Authorization
+        With REST, you usually secure an entire endpoint
+        With GraphQL, you secure on field level
+        And this is resolved by schema resolver
+  RPC
+    internal microservice communication
+    Very efficient
+
+
+Follow up question
+  Pagination
+    1/ PAge - GET /events?page=2&limit=25
+      The idea is you can't return a massive data to the client since it will increase the latency due to massive size
+      However, this will not work well in the case your data keeps getting updated
+    2/ Cursor - GET /events?cursor=123&limit=25
+      The cursor help to resolve the scenario where your list of data keep getting updated in a short time period (1-2second)
+      As you move the cursor, you can see a data
+  Security
+    JWT
+      Encodes user data and permissions directly into a signed token
+    Session token
+      A random token which is used to find user info server side
