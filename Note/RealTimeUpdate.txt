@@ -1,0 +1,138 @@
+Real Time Update Challenge
+  The problem is how can we get the update from the server to client in minimal latency
+  Polling
+    Default approach where it is stateless and easy to scale
+    Most problem dont need sub-second update
+    Cons:
+    - No real-time update
+    - If you have high traffic like 100k request per second then you need to introduce index or even caching to optimize the latency
+    Only use this if latency is not that important
+  Long polling
+    It's like short polling but instead of return response immediately, the server gonna hold request until there's an update or timeout
+    Good fit
+      Infrequent updates from server
+      Little new Infra
+      Watch LB/Gateway Timeout (making sure the timeout from server/client is lesser than gateway/load balancer timeout)
+    Poor fit
+      High-frequency updates
+  Server sent event
+    a client will request to server and open a stream to receive response from server to client
+      Typically the content-type: text/event-stream
+    Look like a push notification
+    It is resiliency because the event source (built-in from browser) will re-connect automatically if the connection is timeout/cut off
+    Best fit
+      Frequency push update from server to client
+  WebSocket
+    Bi-directional streaming between client and server
+    Typically, we will introduce a new Websocket service to mange connection between server and client. So it's like an gateway where it will manage websocket connection between the client and server.
+      For example: some connection is idle which can be killed and re-connect if client needed
+    And then, the websocket service will send message to our server as stateless services
+    Good fit
+      Frequent
+      Very low latency
+      2 way communication
+  WebRTC
+    The client connect to each other directly
+
+Concern when working with real time update
+  First hop: Client
+    Concern: Choosing a protocol
+      Do we have latency sensitive?
+        if it's later than 5sec, go for polling
+      Frequent & two-way?
+        If frequency only, goes for server sent event
+      Audio or video?
+        Websocket should be default here since we can control the communication between client through the server.
+        There's no malicious client
+    Concern: When connection drops
+      The connection is drop between client and server and sometimes it not really the connection is drop. it just the client still can send the message to the server and the server by the time is restarted and forgot the connection
+      This case called zombie connection
+      solution: We can introduce heart beat/health check to check the connection. if it's timeout or return erorr, the client can disconnect and re-connect with some backoff retry
+    Concern: Miss events
+      The event is lost due to the connection lost from the client
+      Solution: the client can track the event it consumed and when it re-connect, it cna tell the server the last event it recieved so server can start resend again. Think a message offset in kafka
+  Second hop: Server
+    The problem goes with this is we dont know when the update source push the update so the server can send back to the client
+    Solution 1: Server-side polling
+      The update source will update directly to the database and the server check the update from the database periodically
+      -> The same cons of client polling where we increase the load and latency
+      So if the topic require low latency, dont use this but to use push-approach
+    Concern: Update source dont know which server client connect to, to push the update to that server
+      Consistent Hashing
+        We hash the userId to detect which server the user belong to
+        Implementation in real time update
+          1/ Store the ring
+            We can use the zookeeper to implement a ring. This is to help the automation when a new server is created
+          2/ Server-to-server routing
+          3/ Clients find their server
+            First Option: We have additional lookup service which ask zookeeper for the ring and the client call to lookup service to know which server it should connect to
+            Another option: Redirect where user gonna connect to any server and ask if the client connect belong to that server. That server will tell if the user belong to its. if it doesnt, it will tell user which server user belongs to
+        Cons:
+          Re-balance in adding/removing a server
+          Thundering herd problem when you scale the server. all the user connection goes to new server immediately which cause thundering herd connection
+            A way to avoid this is to let user switch connection to new server 1 by 1 instead of all of them by same time
+      Pub/sub
+        The idea is when user connect to a specific server. Let say user A connection to server 1. The server 1 will subscribe to a queue based on the user ID in the pub/sub . The update source can simply produce the message to the queue based on the user ID source
+        The cons:
+          The pattern to create topic/queue to support this usecase ?
+            per user per topic?
+          Single point of failure
+        Concern: Delivery options
+          Durability problem
+            In-memory pubusb (Redis pub/sub)
+              Live only in memory
+              At most once (Fire and forget option)
+              Good: if only we need the latest update
+            Durable log (Kafka / Redis streams)
+              Message stored
+              Resume from an offest
+              Good: need full history of update
+            Store & Notify (Database + pub/sub)
+              Database = source of struth
+              Pub/sub = live delivery
+              Reconnect -> catch-up query
+              Example: What's app
+                When user connect, we load the data from database since the last time the user sync messages
+                While user connect, pub/sub get new message to their phone
+    Fanout
+      An approach when a celebrity post a tweet or start an livestream, who has million viewer/follower
+        If 1 update needs to reach millions of connection at a time, it will set off an alarm for our system
+        If we have to write update for separate millions of user, our system is also going to melt down
+      A better solution is to publish it once and distribute it in layer. So each server will recieves 1 copy and fan it out to its own connection
+    Comment
+      For comment, you can also use batching instead of sending each once few time seconds
+    Choosing a design
+      Latency sensitive?
+        If no, server-side polling
+      Services already stateful?
+        If yes, consistent hashing
+        If no, pub/sub is a great pattern and this is the default for second hop
+
+
+Wrap-up Application
+  Live dashboard
+    Requirement: 5s delay is fine
+    Hop 1(client): Polling and SSE
+    Hop 2(server side): Pub/sub
+  Collaborative editor
+    Requirement:
+      High update
+      Low latency
+    Hop 1: Websockets
+    Hop 2: Consistent Hashing
+  Chat
+    Hop 1: SSE or Rest to Send
+    Hop 2: Pub/sub or consistent hashing
+  Two worked decision
+    Driver Application
+      Hop 1: SSE and Rest call (for the cancel API)
+      Hop 2: Pub/sub (topic per ride)
+    Live comments on live video
+      Hop 1:
+        SSE to receive comment from other and rest api for posting comment
+      Hop 2: Pub/sub topic per video
+
+The framework decision
+  What each hop needs?
+  Simplest thing that work?
+  What happens on failure
