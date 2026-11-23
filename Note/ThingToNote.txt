@@ -1,0 +1,7 @@
+Thing to note
+  1/ PostgreSQL have extension PostGIS which help to support geospatial data and full text search
+    We only need to update our query to do that
+  2/ If we work with a system contains geo spatial data, there's maybe a city, country whose map is like an polygon rather than an circle like always
+    In this case, we can use GeoJSOn which contains a list of lat and long which help to form their polygon
+    Based on this, we can do some calculation to figure out the location inside that. However, the query really expensive
+    -> Try to pre-compute (de-normalize) the location on write
