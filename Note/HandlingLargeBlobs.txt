@@ -1,0 +1,37 @@
+Handling Large Blobs
+  Uploads/Downloads
+    How the client can update directly to our object storage directly?
+    Client wil call to server and server will call to object storage server (or the server does it itself) to give a signed url where it contains authN and authZ for client to upload
+  Upload Reliability
+    Large File upload (5GB or more)
+      We use chunking approach where we split the file into smaller chunk and let them retry the failed chunk only
+      So typically, the client request upload to the server and the server will request chunk upload to the object storage and the object storage return an uploadId to server
+        For each chunk, server will generate a pre-signed url for client to upload for each part
+        And then, client use that pre-signed url to upload the each part of the chunk to the object storage
+        The object storage will return an e-tag for each chunk, it simply used for checksum
+        And then client request another pre-signed url for the next chunk to upload and then the flow will keep doing that until the all the chunk is uploaded
+        Once all the part is in the object storage, the server will send the ordered list to the object storage server so it can combine all the chunk as the ordered
+      So in the interview, we can just say "I will use a resumable multipart upload to object storage. The client uploads the file in chunks, and each chunk can be retried independently if the connection fails."
+  State Sychronization
+    server need to know when the file is done upload since server no longer track this
+    We can use a client to send an api for success but client can treat us so it's not reliable source
+    Antoher way is object storage send an event for us
+
+
+Deep dives
+  Prevent Upload Abuse
+    The client can upload a malware byte to our object storage or violent content to object storage
+    So a way to cover this is the client only upload to the private folder in object storage and then we have another thing to review it before publishing
+    So some cloud provider have service for this usecase:
+      AWS: GuardDuty Malware Protection
+      GCP: CloudRun + ClamAV
+      Azure: Microsoft Defender for Storage
+  How can we make sure the download large file is fast?
+    We can use a HTTP Range-request where instead of downloading all the file, we only request the bytes it needs
+      For example: Video, mp3
+
+Interview tips
+  Keep the file in object storage
+  Keep the metadata and status in database
+  Use signed url to move the byte directly from client to blob storage
+  Use storage events plus reconciliation to know when the upload is actually completed
