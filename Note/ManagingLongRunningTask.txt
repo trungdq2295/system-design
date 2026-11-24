@@ -1,0 +1,17 @@
+Manage Long running task
+  Not all request is low latency which is under 500ms
+  for some request, such as generate an report for past year, really took more than 30second or even 1 minutes
+  Naive Approach
+    We still use request/response and let user wait for like 30seconds to wait the request is done
+      -> Bad user experience
+    However, when the traffic reach to 100k request and each request wait for seconds -> bad for our server
+  Solution
+    We decouple this flow by using an queue or an outbox pattern
+    So simply user request and the server return that their request is acknowledge and return an id to let the client to track it
+    When worker is done, it simply update the status in the database and send notification to user via email or push notification
+
+
+Deep dives
+  What if the queue hit a million jobs?
+    You can set auto scale the worker based on the consumer lag
+    Back-pressure which is to prevent the producer to produce more message
