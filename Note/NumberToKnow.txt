@@ -1,0 +1,49 @@
+Number to Know in system design
+  Caching
+    Memory: Up to 1TB on memory-optimized instance
+    Latency:
+      Reads: <1ms within the same regions
+      Write: < 1ms same AZ, 1-2ms cross AZ
+    Throughput: 100k-200k operations/seconds per instance for in-memory caches like Redis
+    When to consider scaling:
+      Data size: Approaching 1TB in size
+      Throughput: Sustained throughput of 100k + ops/second
+      Read Latency: Requirement below 0.5ms consistent
+    This "cache everything" approach, while seemingly brute force, typically cost less than engineering time spent on selective caching logic
+  Databases
+    Storage: Single instance handle up to 64 TiB for most database engines
+    Latency:
+      Read: 1-5ms for cached data, 5-30ms for disk
+      Writes: 5-15ms for commit latency (for single node, high-performance setups)
+    Throughput
+      Read: Up to 50k TPS (transaction per second) in single node configuration
+      Write: 10-20k TPS in single-node configuration on Aurora and RDS
+    Connection: 5-20k concurrent connections
+    When to consider sharding:
+      Data size: approaching or exceeding 50TiB
+      Write Throughput: Consistently exceeding 10k TPS
+      Read Latency: Requirement below 5ms for uncached data
+      Geographic distribution: Cross-region replication or distributed needs
+      Backup/Recovery: backup windows that stretch into hours or become operationally impractical
+  Application Server
+    Connections: 100k+ concurrent connection per instance
+    CPU: 8-64cores
+    Memory: Hundreds of GB are common, with multi-TB instance available
+    Network: 25Gbps standard, up to 50-100Gbps
+    Startup Time: Ten of seconds to minutes for containerized apps
+    When to consider horizontal scaling
+      CPU Utilization: Consistently above 70-80%
+      Response latency: Exceeding SLA or critical threshold
+      Memory usage: trending above 70-80%
+      Network bandwidth: Approaching instance limit
+  Message Queues
+    Throughput: up to 1 million messages/second per broker
+    Latency: 1-5ms end-to-end within a regions
+    Messages ize: 1KB-10MB
+    Storage: Up to 50TB per broker
+    Retention: week to months of data
+    When to consider scaling
+      Throughput: Nearing 800k messages/second per broker
+      Partition Count: approaching 200k per cluster
+      Consumer Lag: consistently growing, impacting real-time processing
+      Cross-region replication: if geographic redundancy is required
