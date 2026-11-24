@@ -1,0 +1,84 @@
+Contention
+  It's the problem with multiple processes compete the same resource for exact same time
+  Solution
+    Compare and set: Where you combine your read and write into a same transaction
+      Condition write in database with WHERE clause
+      This is safe because database sql never let 2 write happen at a same time and it's a built-in in all SQL databases
+      The most simple approach where we can take advantages from database to do it for us
+    Explicit Locking: Lock the row and ensure only 1 people can do it at the same time
+      It happen when you have to do logic condition on application layer which couldnt be solve in database layer
+      Pessimistic lock: SELECT for update
+        It assumes that conflict write will happen often
+        Pros:
+          re-use the SQL built-in
+        Cons:
+          Can lead to starvation
+      Optimistic concurrency control: Version number for the row
+        Conflicts are extremely rare which are opposite of pessimistic
+      When should we use pessimistic lock or optimistic concurrency control (OCC)?
+        How often do your write actually collide?
+          If it's common -> Pessimistic locking is a good choice
+            Because if we use OCC, then when the collisions happen, the user have to retry over and over again which leads to more request to your database
+            Pessimistic locking simply make the request waiting until the row is unblocked
+          If it's rare, OCC is great because you have low retry
+    Write skews and isolation transaction
+      For example: 2 on-call engineer at the same time and they caught a flue and they want to take a sick leave (Alice and Bob)
+        Alice goes in and see the Bob is available so she log sick leave which let the Bob to be main on-call
+        Bob also goes in and see the Alice is available so he log sick leave which let the Alice to be main on-call
+        Since those 2 transaction is isolated so the write become both of them log sick leave and none is currently main on-call
+      So the write skews is nothing flags that those reads are what your decision is actually depending on
+      The most atomic way to catch this is to let the database track those read for you -> Isolation level in SQL come into play
+      Transaction level
+        Read Uncommitted
+          Can see uncommited changes from other transaction
+        Read commited
+          Default option in most of database
+          Can only see in committed changes
+        Repeatable read
+          Same data read multiple times within a transaction stay consistent
+        Serializable
+          Strong isolation
+          Transactions appear to run on after another
+          -> This is to help to resolve Write skews because it block another transaction
+      Remember: Try to make everything in a single row as much as possible. dont try to split it
+        So for example, we can keep a thing like a row with count the current engineer oncall at the moment and decrement every update
+    Distributed lock with long-hold
+      For example: you hold the seat-booking for 10 minutes
+      You can use a thing like Redis for the distributed lock. However, there still a case where the 2 worker can acquire a same lock due to some network problem -> rarecase
+      Or you can add a column which stands for a disitrubted lock in database such as "reserved_by" and "reserved_until"
+        -> Conditional write in database
+
+Decision Metric
+  Your check is a predicate on the row -> Conditional write
+  You have to read, decide in application code, then write -> Pessimistic lock
+  Your invariant spans rows that never collide -> Serializable / Single row
+  The hold has to outlive a single transaction? -> Distributed lock
+
+Deep dives
+  How do you prevent deadlocks with pessimistic locking
+   Example case: Alice transfer money to Bob and Bob also transfer money to Alice
+    -> Pessimistic will lock both row of Alice and Bob and each process is waiting for each other to release
+   The solution:
+    1/ always lock the row in deterministic order
+      Wit the given example, Both transaction will lock the row of Bob first and then Alice later (we sort based on the name descendant)
+    2/ Database nowadays handle the dead lock for us so we can just retry the failed transaction
+  How can you handle the ABA problem with optimistic concurrency?
+    ABA problem describe the vase where a value changes from A to B and back to A again between the read and write of your version in OCC when you want to use OCC without introducing version number column
+      For example:
+        You have review restaurant system and you use the reviews count column as "version number" column
+        By the time you update your data, someone can delete their reviews and also someone add their review
+        For example: a sushi restaurant have 100 reviews, you update your data based on that number of review like
+          update restaurant set avg_rating = 4.5 where restaurant_name ='sushi' ANd review_count = 100;
+          and someone can delete their reviews and also someone add their review
+          -> this lead to the version number is working wrong
+  What about performance when everyone wants the same resource?
+    We should push back to ask
+      if the hot row can be splitted into multiple rows
+      if we can make the eventual consistency
+      What if we really need strong consistency on 1 single row?
+        Decouple with outbox pattern with single worker for serializable thing
+        This is the tradeoff between the contention accuracy or high throughput
+
+
+
+
