@@ -1,0 +1,34 @@
+Scaling Reads
+  A heavy read system
+  Limited:
+    Disk I/O
+  Solution
+    Optimize read performance within your databases (indexing & Denormalization)
+    Scale your database horizontally (read replica and/or sharding)
+    Add external caching layer ( application and/or CDN)
+
+  Indexing
+    Typically, the index slow down the write performance. However, modern database handles it really well
+    so over indexing is better than under indexing
+  Read Replicas
+    Propagate writes from leader to follower async or sync (strong consistency)
+    When primary is failed/crashed, we can promote replicate to a new leader to keep serving traffic
+
+
+Common Deep dives
+  What happens when your queries start taking longer as your dataset grows?
+    -> Goes with index to prevent full table scan
+    Be explicit on which column you gonna add index to make it faster
+  Even with indexing, how do you scale to 100s of thousands of reads per second
+    If the data is skew (which means most of data is just of subset of some data), add cache layer for this
+    If not, use read replicas since all the data is needed, the distribute the request to read replica is  better
+  How do you handle millions of concurrent reads for the same cached data? (Hot key problem)
+    1 solution is to use request coalescing which means is that when multile users request the same key at the same time, we gonna combine into a single back end request and then we only need to make one request to the actual cache
+    Another way is to cache key fanout which mean to spread the hot key to many shards and let them serve the traffic
+      So it's liek you create cache key: Ts-1, TS-2, TS-3 ... across the shard and let the application code can random get any shard
+  How do you handle cache invalidation when data updates need to be immediately visible? (strong consistency)
+    You need to clarify the problem when it comes to strong consistency because not all the usecase need it
+    The best way to solve this is not to introduce cache and read data directly but it not really always work lol
+    IF you have to handle it, then we can just simply use approach write to database and then invalidate the cache so the next user come in can cause cache miss and get data from database and insert to cache
+      However, this come to with 1 problem where we have read replica and user who got cache miss, read the stale data from read replica where it hasn't been synced yet
+      So to solve this case, we can introduce an cache versioning
