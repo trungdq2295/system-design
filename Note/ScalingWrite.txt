@@ -1,0 +1,79 @@
+Scaling Write
+  A scenario where system have high traffic in write over read
+  4 solutions
+    Vertical scaling & DB Choice
+      The cleanest fix is to upgrade resource server for database
+      Or you can have another DB choice
+        Cassandra
+          A high performance for write application because it just a append only log.
+          However, the tradeoff is the write have to check multiple file and merge the results
+          -> Trading read for write performance
+    Sharding & Partitioning
+      Typical a horizontal scaling where we introduce more shard
+      2 question arisen: Which shard own this data? How does the app find it?
+        You can use hashing the data (primary key) to determine which shard it belong to and how to get it
+      But the interview only want to know how you shard the data?
+        Specifically, they care about how you pick your partitioning/shard key
+      The good key help you distribute the data evenly across the shard
+        For example: if u use country as shard key, then China can be hot key (many population) and Vietnam have small number of data
+      Vertical Partitioning
+        The idea is you split your data vertically and store them on different storage which is suitable for your read pattern
+        For example: Tweet Post contains text, media, like count, view count and raw event
+          We can split the text, media into a same storage (postgresql)
+            like count, view count same storage (Redis)
+            raw event same storage (Cassandra)
+    Queue & Shedding
+      Auto scaling doesnt really work in database because it will require downtime
+      So we have 2 options
+        Write Queue
+          We buffer the write in a queue and we can process them as fast as we can without losing the write
+          Tradeoff:
+            Asynchronous processing
+            Consumer lag if the worker process the write slower than the speed of producer
+          So we only use this for short lived burst
+        Load shedding
+          We can drop the write in the way that business accepted to prevent the system from failing
+            For example: we recieve 15k write request, we can proceed 10k write and another 5k can just drop it (return 503/429 http status code)
+          We can define which request to drop based on the priority such high and medium is to keep but low is to drop
+    Batching & Aggregation
+      Batching
+        If it possible, try to batch your write request
+        A way to do this is we can keep a short buffer in memory and then flush those out to database when it reach an threshold (let say 1000 request batch)
+          -> need a way to prevent lost data if the buffer is crashed
+        Batching only help when you have multiple event per key
+      Hierarchical Aggregation
+        In this approach, we aggregate data a multiple levels instead of sending every event to a central service
+
+Deep dives
+  Re-sharding
+    How do we can increase the shard without introduce down time?
+      Naive approach: Announce under maintenance
+      Gradual Migration:
+        We introduce new shard alongside the old shard
+        And for some period, we do dual-write and the read gonna keep to read from old shard until you're confident that the new one is caught up and then we gonna flip over
+        Pros
+          Data integrity
+          Zero downtime
+        Cons
+          Race-condition complexity
+  Hot keys
+    Always split your key into smaller key like and the let the write distribute data to your shard
+    Pros
+      The write per shard divide by k (with k is the number of key you want to split smaller)
+    Cons
+      Storage will be across the k shard
+      Read also across the k shard
+    -> Another approach: Split dynamically only when that key get hot
+    This approach only work for those data such as "Likes", views, counter, sums
+      And it not work for atomic data such as "user profile", "post body", "payment records"
+Interview tips
+  Don't wait for your interview to ask about the write scale
+  You raise the bottleneck before they do -> back of envelop estimation is kind of thing you can define
+    Dont over-engineer if the number look fine
+    If the number is over million, you should be prepare to do that
+  Walk through each strategy in order
+  As the rule:
+    Identify the bottleneck
+    Quantify it
+    Pick the strategy that fixes it
+    Be honest about the tradeoff
