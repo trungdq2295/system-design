@@ -1,0 +1,78 @@
+Multiple Step Processes
+  An workflow system
+  Naive approach
+    Typically 1 api server which does the step in order -> Junior would propose this problem
+    However, this introduce some problem
+      Crashes on 1 api server
+        Typically 1 step is done and need to tell the server to ack but the server is dead, what we gonna do?
+      Callback
+        The step callback to the server through the webhook when the step is done
+    So the problem is when an issue happen in the midway, how can we restart the step again?
+      Such as technical failure: crashed, retry, failure
+        or business failure: what if the item is out of stock? what if it need confirmation from user? what if user want to refund?
+  Interviewers are looking to see whether you wade into a tar pit of patches and keep going or you realize there's systemic issues here and you chart toward a better solution
+  Solution
+    Saga approach
+      The idea is each step runs and commits on its own and each one get a matching undo which we'll call a compensating action
+        You run a step once at a time and later if there's a step fail, you walk backwards firing those compensations to undo whatever already happens
+      Choreography
+        What if we stop storing the current state and instead store the stream of events that got us there?
+          For example:
+            Order placed -> Payment charged -> Inventory reserved -> label created -> order picked -> email sent
+          We have different worker submitted on different event and each worker will produce an event when they're success or failed
+            -> Payment worker will pull the event "Order placed" and "Inventory Failed" to process refund
+              Inventory worker will pull the event "Payment charged"
+        -> This gave us a scalability where we can simply increase the worker number in each Worker type
+        However, this introduce an issue
+          what if we want to introduce a new event which is midway like Fraud Detection between Payment and Inventory event?
+          Tracing and Debug
+            What if a workflow involve many step which also belong to many teams?
+        When to use this?
+          Mid-complexity workflow
+          Loosely coupled team
+          Stable, established processed (not frequent changes)
+      Orchestration
+        An orchestration service to handle the event.
+          Example: Temporal - an open-source from Uber
+
+
+    Temporal
+      Contains these component which help to automate the workflow:
+        Temporal Server
+          Schedule tasks & track timeout
+        History Database
+          Stores append-only workflow history
+        Workflow Workers
+          Run workflow code
+        Activity Worker
+          This is to help when your workflow worker hit the external call, it doesnt call the external service directly but it asks the server to schedule the activity and activity worker make the real call and report it back
+
+
+The deep dives interview
+  How do you handle updates in your workflow?
+   You got like ten thousands update in flight, however, you introduce a new step in your workflow and deploy it with new events
+   So what happen with to your old workflow?
+    Backward compatible is the key and a way to resolve this is to introduce version for your event to make sure the old event can still process in the old flow
+  How do you make sure the step run exactly once?
+    At least once attempt + idempotency
+    We need to reconcile data if it fail midway bro
+  How do we manage history size?
+    - Activity inputs/output smalls
+    - Continue as New
+
+
+Interview tips
+  Do not try to use those multi-process steps
+  If part of your design needs a flowchart that has steps and branches and failure that need undoing, there's a good chance a workflow belong there
+    Example: Payment system
+  Name the problem before you name the tool
+    Partial Failure
+    Long-running steps
+    Compensation or audit
+  So typiclally, in this appraoch, if you can
+    - Spot the state machine
+    - Name the failure mode first
+    - Explain replay, idempotency & compensation
+
+
+
